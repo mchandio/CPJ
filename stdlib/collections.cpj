@@ -1,0 +1,15 @@
+# CPJ Standard Library: collections
+
+struct List<T> {
+    items: any[]
+    def append(self, item: T):
+        self.items = self.items + [item]
+    def pop(self) -> T:
+        if self.items:
+            v = self.items[0]
+            self.items = self.items[1:]
+            return v
+        return None
+    def __len__(self) -> int:
+        return len(self.items)
+}

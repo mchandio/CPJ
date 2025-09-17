@@ -1,0 +1,13 @@
+# Sample CPJ Program
+class HelloWorld {
+    def main() {
+        print("Hello, CPJ World!")
+    }
+}
+
+def add(a: int, b: int) -> int {
+    return a + b
+}
+
+x = add(5, 7)
+print(x)

@@ -1,0 +1,8 @@
+# CPJ Standard Library: IO
+
+def print_line(s: string):
+    print(s)
+
+def read_line() -> string:
+    # Placeholder for input (would map to input() in Python backend)
+    return ""

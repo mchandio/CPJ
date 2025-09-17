@@ -1,0 +1,46 @@
+
+CC=g++
+PYTHON=python3
+JAVAC=javac
+
+all: compile
+
+
+compile:
+	$(CC) -o cpj_compiler cpj_compiler.cpp
+	@if [ -d java ]; then \
+		$(JAVAC) -d bin java/*.java || true; \
+	fi
+
+run:
+	# Run the compiler against the sample CPJ program. Adjust the path as needed.
+	./cpj_compiler samples/demo.cpj || true
+
+python-install:
+	@echo "Creating venv and installing Python requirements..."
+	python3 -m venv .venv || true
+	.venv/bin/python -m pip install --upgrade pip
+	.venv/bin/python -m pip install -e .
+	.venv/bin/python -m pip install -r requirements.txt || true
+
+python-test:
+	@echo "Running Python tests in venv..."
+	.venv/bin/python -m pytest -q
+
+clean:
+	rm -f cpj_compiler
+	rm -rf build
+
+release: all
+	./scripts/create_release.sh v1.0.0
+
+
+# Vendor Java libs
+LIB_DIR=lib
+lib/%.jar:
+	mkdir -p lib
+	@echo "Place $* in lib/ or use a build tool to fetch it"
+
+
+# C++ deps guidance
+# Add include paths and link flags for chosen libraries (e.g. -I/path/to/include -L/path/to/lib)

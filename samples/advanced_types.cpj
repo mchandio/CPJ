@@ -1,0 +1,35 @@
+# Advanced Types and GUI Sample for CPJ
+
+struct Point {
+    x: int
+    y: int
+}
+
+class Person {
+    name: string
+    age: int
+    def greet(self):
+        print("Hello, " + self.name)
+}
+
+def add_points(p1: Point, p2: Point) -> Point {
+    return Point(x = p1.x + p2.x, y = p1.y + p2.y)
+}
+
+def main():
+    alice = Person(name = "Alice", age = 30)
+    bob = Person(name = "Bob", age = 25)
+    alice.greet()
+    bob.greet()
+    p1 = Point(x = 2, y = 3)
+    p2 = Point(x = 4, y = 5)
+    p3 = add_points(p1, p2)
+    print("Sum point:", p3.x, p3.y)
+
+GUI {
+    types {"name": "string", "age": "int"}
+    addTextField("name")
+    addTextField("age")
+    addButton("Greet", greet(name, age))
+    show()
+}

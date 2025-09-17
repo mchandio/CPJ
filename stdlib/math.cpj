@@ -1,0 +1,16 @@
+# CPJ Standard Library: math
+
+def abs(x: int) -> int:
+    if x < 0:
+        return -x
+    return x
+
+def max(a: int, b: int) -> int:
+    if a > b:
+        return a
+    return b
+
+def min(a: int, b: int) -> int:
+    if a < b:
+        return a
+    return b

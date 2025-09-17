@@ -1,0 +1,132 @@
+// Full FarmFlow CPJ sample (standalone, JSON persistence)
+import json
+import os
+
+DATA_FILE = "farmflow_data.json"
+
+class Farmer {
+    def __init__(id: int, name: string, phone: string, village: string) {
+        this.id = id
+        this.name = name
+        this.phone = phone
+        this.village = village
+    }
+}
+
+class Bill {
+    def __init__(id: int, date: string, farmer_id: int, crop: string, weight: float, rate: float) {
+        this.id = id
+        this.date = date
+        this.farmer_id = farmer_id
+        this.crop = crop
+        this.weight = weight
+        this.rate = rate
+    }
+}
+
+state = {"farmers": [], "bills": [], "next_farmer_id": 1, "next_bill_id": 1}
+
+def load_state() {
+    if os.path.exists(DATA_FILE) {
+        try:
+            s = open(DATA_FILE).read()
+            state.update(json.loads(s))
+        except Exception as e:
+            print("Failed to load state:", e)
+    }
+}
+
+def save_state() {
+    try:
+        open(DATA_FILE, 'w').write(json.dumps(state, indent=2))
+    except Exception as e:
+        print("Failed to save state:", e)
+}
+
+def add_farmer(name: string, phone: string, village: string) {
+    fid = state.next_farmer_id
+    f = {"id": fid, "name": name, "phone": phone, "village": village}
+    state.farmers.append(f)
+    state.next_farmer_id = fid + 1
+    save_state()
+}
+
+def add_bill(date: string, farmer_id: int, crop: string, weight: float, rate: float) {
+    bid = state.next_bill_id
+    b = {"id": bid, "date": date, "farmer_id": farmer_id, "crop": crop, "weight": weight, "rate": rate}
+    state.bills.append(b)
+    state.next_bill_id = bid + 1
+    save_state()
+}
+
+def totals() {
+    total_income = 0.0
+    for b in state.bills {
+        total_income = total_income + (b.weight * b.rate)
+    }
+    return total_income
+}
+
+load_state()
+
+GUI {
+    addLabel("FarmFlow (CPJ) - Desktop")
+    addLabel("Add Farmer")
+    addTextField("farmer_name")
+    addTextField("farmer_phone")
+    addTextField("farmer_village")
+    addButton("Add Farmer")
+
+    addLabel("Add Bill")
+    addTextField("bill_date")
+    addTextField("bill_farmer_id")
+    addTextField("bill_crop")
+    addTextField("bill_weight")
+    addTextField("bill_rate")
+    addButton("Add Bill")
+
+    addLabel("Farmers")
+    addTextField("farmers_list")
+
+    addLabel("Totals")
+    addTextField("totals")
+
+    show()
+}
+
+// Event handlers (pseudo-CPJ callbacks the compiler will wire into generated GUI)
+def on_Add_Farmer_clicked(ctx) {
+    name = ctx.get("farmer_name") or ""
+    phone = ctx.get("farmer_phone") or ""
+    village = ctx.get("farmer_village") or ""
+    if name.strip() == "" {
+        ctx.alert("Name required")
+        return
+    }
+    add_farmer(name, phone, village)
+    ctx.set("farmers_list", json.dumps(state.farmers))
+    ctx.alert("Farmer added")
+}
+
+def on_Add_Bill_clicked(ctx) {
+    date = ctx.get("bill_date") or ""
+    fid = int(ctx.get("bill_farmer_id") or 0)
+    crop = ctx.get("bill_crop") or ""
+    weight = float(ctx.get("bill_weight") or 0)
+    rate = float(ctx.get("bill_rate") or 0)
+    if fid == 0 {
+        ctx.alert("Farmer ID required")
+        return
+    }
+    add_bill(date, fid, crop, weight, rate)
+    ctx.set("totals", str(totals()))
+    ctx.alert("Bill added")
+}
+
+// Initialize UI values
+GUI.set_initial = lambda ctx: {
+    ctx.set("farmers_list", json.dumps(state.farmers))
+    ctx.set("totals", str(totals()))
+}
+
+print("FarmFlow full CPJ sample ready.")

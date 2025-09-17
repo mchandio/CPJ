@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cpj"
+version = "0.0.0"
+description = "CPJ language runtime helpers and tooling"
+authors = [ { name = "CPJ Maintainer", email = "maintainer@example.com" } ]
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["cpj", "compiler", "gui"]
+dependencies = [
+    "astroid",
+    "antlr4-python3-runtime",
+    # Optional dev dependency for language server development
+    "pygls",
+]
+
+[tool.setuptools.packages.find]
+where = ["python"]
+exclude = ["tests"]

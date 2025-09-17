@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'org.cpj'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JSON support
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'CPJ Java components',
+                   'Implementation-Version': version
+    }
+}

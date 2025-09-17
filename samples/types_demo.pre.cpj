@@ -1,0 +1,25 @@
+def show(a, b, c):
+<INDENT> print('a=', a, type(a))
+print('b=', b, type(b))
+print('c=', c, type(c))
+
+<DEDENT> GUI {
+<INDENT> # token-style types
+types count:int flag:bool
+addTextField("count")
+addTextField('flag')
+
+# multi-line dict-style types
+types {
+<INDENT> "x": "int",
+'y': 'float'
+<DEDENT> }
+addTextField("x")
+addTextField("y")
+
+# per-field override
+addTextField("c", "str")
+
+addButton("Run", show(count, flag, c))
+show()
+<DEDENT> }

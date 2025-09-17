@@ -1,0 +1,65 @@
+// samples/farmflow.cpj
+// Simplified FarmFlow app written in CPJ
+
+class Farmer {
+    def __init__(name: string, phone: string, village: string) {
+        this.name = name
+        this.phone = phone
+        this.village = village
+    }
+}
+
+class Bill {
+    def __init__(date: string, farmer: string, crop: string, weight: float, rate: float) {
+        this.date = date
+        this.farmer = farmer
+        this.crop = crop
+        this.weight = weight
+        this.rate = rate
+    }
+}
+
+farmers = []
+bills = []
+
+def add_farmer(name: string, phone: string, village: string) {
+    farmers.append(Farmer(name, phone, village))
+}
+
+def add_bill(date: string, farmer: string, crop: string, weight: float, rate: float) {
+    bills.append(Bill(date, farmer, crop, weight, rate))
+}
+
+# Simple demo data
+add_farmer("Ali", "03001234567", "GreenVillage")
+add_farmer("Zara", "03007654321", "BlueVillage")
+add_bill("2025-09-01", "Ali", "Wheat", 100.0, 35.5)
+add_bill("2025-09-02", "Zara", "Rice", 50.0, 60.0)
+
+# GUI construct (will be used by CPJ tooling to generate Java Swing app)
+GUI {
+    addLabel("FarmFlow - Lightweight Desktop")
+    addLabel("Add Farmer:")
+    addTextField("farmer_name")
+    addTextField("farmer_phone")
+    addTextField("farmer_village")
+    addButton("Add Farmer")
+
+    addLabel("Add Bill:")
+    addTextField("bill_date")
+    addTextField("bill_farmer")
+    addTextField("bill_crop")
+    addTextField("bill_weight")
+    addTextField("bill_rate")
+    addButton("Add Bill")
+
+    addLabel("Farmers List")
+    addTextField("farmers_list")
+
+    addLabel("Totals")
+    addTextField("totals")
+
+    show()
+}
+
+print("FarmFlow CPJ sample ready. Run the CPJ compiler to generate/launch the GUI.")

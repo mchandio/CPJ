@@ -1,0 +1,3 @@
+source:samples/advanced_types.cpj
+java_emitted:true
+python_emitted:true

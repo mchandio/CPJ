@@ -1,0 +1,28 @@
+{
+    "name": "cpj-language",
+    "displayName": "CPJ Language",
+    "description": "Minimal CPJ language support (scaffold)",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.50.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "cpj",
+                "aliases": [
+                    "CPJ",
+                    "cpj"
+                ],
+                "extensions": [
+                    ".cpj"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": []
+    }
+}

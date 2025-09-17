@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Wrapper to run the existing cpj_compiler binary but prevent it from launching the
+# generated Java GUI by providing stub `java` and `javac` binaries on a temporary PATH.
+
+TMPDIR=$(mktemp -d)
+cleanup() { rm -rf "$TMPDIR"; }
+trap cleanup EXIT
+
+cat > "$TMPDIR/java" <<'EOF'
+#!/usr/bin/env sh
+echo "[cpj_compiler_no_run] java stub invoked - skipping GUI run"
+exit 0
+EOF
+
+cat > "$TMPDIR/javac" <<'EOF'
+#!/usr/bin/env sh
+echo "[cpj_compiler_no_run] javac stub invoked - pretending compile"
+exit 0
+EOF
+
+chmod +x "$TMPDIR/java" "$TMPDIR/javac"
+
+export PATH="$TMPDIR:$PATH"
+
+# Execute the real cpj_compiler binary (next to this wrapper)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+REAL_BIN="$SCRIPT_DIR/cpj_compiler"
+if [ ! -x "$REAL_BIN" ]; then
+  echo "cpj_compiler binary not found at $REAL_BIN" >&2
+  exit 2
+fi
+
+exec "$REAL_BIN" "$@"

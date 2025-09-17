@@ -1,0 +1,11 @@
+print("Hello, CPJ World!")
+
+def greet(name):
+    print("Hello " + name)
+
+GUI {
+    addLabel("Hi from CPJ")
+    addTextField("name")
+    addButton("Greet")
+    show()
+}

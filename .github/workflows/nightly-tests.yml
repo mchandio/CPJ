@@ -1,0 +1,51 @@
+name: Nightly Full Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # daily at 02:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  nightly-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: nightly-pip-3.12-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          nightly-pip-3.12-
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    - name: Build cpj_compiler
+      run: |
+        g++ -std=c++17 -O2 -o cpj_compiler cpj_compiler.cpp
+    - name: Run full tests with coverage
+      run: |
+        mkdir -p reports
+        pytest -q --junitxml=reports/junit.xml --cov=tools --cov-report=xml:reports/coverage.xml --cov-fail-under=80
+
+    - name: Upload reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-reports
+        path: |
+          reports/junit.xml
+          reports/coverage.xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: reports/coverage.xml
+        flags: nightly
+        fail_ci_if_error: true

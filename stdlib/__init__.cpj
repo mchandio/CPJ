@@ -1,0 +1,4 @@
+# CPJ Standard Library module index
+import "collections.cpj"
+import "math.cpj"
+import "io.cpj"

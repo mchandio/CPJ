@@ -1,0 +1,31 @@
+# Minimal Linux-like OS kernel in CPJ (conceptual demo)
+
+struct Process<T> {
+    pid: int
+    state: string
+    data: T
+}
+
+class Scheduler {
+    queue: List<Process<any>>
+    def add_process(self, p: Process<any>):
+        self.queue.append(p)
+    def next(self) -> Process<any>:
+        if self.queue:
+            return self.queue.pop(0)
+        return None
+}
+
+def main():
+    sched = Scheduler(queue=[])
+    p1 = Process(pid=1, state="ready", data={"cmd": "ls"})
+    p2 = Process(pid=2, state="waiting", data={"cmd": "cat"})
+    sched.add_process(p1)
+    sched.add_process(p2)
+    while True:
+        proc = sched.next()
+        if not proc:
+            break
+        print("Running process", proc.pid, proc.data)
+
+main()
