@@ -27,27 +27,48 @@ class Person {
 - Methods are defined like functions inside the class block.
 
 User-defined types are supported in all backends (Python, C++, Java).
+
 Language Reference (v0.1)
+-------------------------
 
-CPJ is a lightweight language focused on GUI DSL constructs and interop with Python, Java, and C++.
+# CPJ Language Reference
 
-Key features
+## Overview
+CPJ is a unified programming language that seamlessly integrates C++, Python, and Java paradigms. It is designed for next-generation developers who demand performance, safety, and expressiveness.
 
-- Function definitions (`def name(params):`)
-- Indentation-aware blocks and an alternative `GUI { ... }` braced form
-- GUI block with widget constructors: `addTextField`, `addButton`, `addCheckBox`, `addSlider`
-- Optional `types` annotations at block or per-widget level
-- Expressions: dotted identifiers, calls, arithmetic and boolean operators
+## Key Features
+- Unified type system
+- Advanced generics
+- Seamless interop between C++, Python, and Java
+- Modern concurrency and memory safety
+- Cross-platform support
 
-Example
+## Syntax and Semantics
+- [See `LANGUAGE_SPEC.md` for full grammar]
+- Example:
 
 ```cpj
-GUI {
-    types count:int flag:bool
-    addTextField("count")
-    addTextField('flag')
-    addButton("Run", handler(count, flag))
+class MyClass<T> {
+    var value: T;
+    def setValue(newValue: T) {
+        value = newValue;
+    }
 }
 ```
 
-See `samples/` for more examples.
+## Interoperability
+- Call C++/Python/Java code natively
+- Use `import` to bring in modules from any supported language
+
+## Memory Management
+- Automatic and manual memory management
+- Unified garbage collection and RAII
+
+## Concurrency
+- async/await, threads, actors
+
+## Error Handling
+- Exceptions, result types, and pattern matching
+
+## More
+- [See `CPJ_Guide.md` and `docs/` for tutorials and migration guides]

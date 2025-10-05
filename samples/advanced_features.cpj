@@ -1,0 +1,82 @@
+# Example program demonstrating enhanced CPJ features
+
+# Multi-language imports
+import python "numpy" as np
+import cpp "vector"
+import java "java.util.concurrent.CompletableFuture"
+
+# Generic interface definition
+interface Collection<T> extends Iterable<T>:
+    def add(item: T) -> bool
+    def remove(item: T) -> bool
+    def size() -> int
+
+# Generic class with memory safety
+class SafeVector<T> implements Collection<T>:
+    types {
+        "data": "vector<T>",
+        "mutex": "std::mutex"
+    }
+
+    # Thread-safe methods with memory safety
+    @cpp
+    safe def add(item: T) -> bool:
+        with self.mutex:
+            self.data.push_back(item)
+            return True
+
+    @cpp
+    safe def remove(item: T) -> bool:
+        with self.mutex:
+            idx = self.data.find(item)
+            if idx != -1:
+                self.data.erase(idx)
+                return True
+            return False
+
+    def size() -> int:
+        return len(self.data)
+
+# Async processing with Python integration
+@python
+async def process_data(data: SafeVector<float>) -> np.ndarray:
+    result = np.array([])
+    for item in data:
+        result = np.append(result, item * 2)
+    return result
+
+# Main class with GUI and concurrent processing
+class DataProcessor:
+    def main():
+        # Create a thread-safe vector
+        data = SafeVector<float>()
+        
+        # GUI for data input
+        GUI {
+            addLabel("Data Processor")
+            addTextField("input")
+            addButton("Process")
+            
+            async def onClick("Process"):
+                input_text = getTextFieldValue("input")
+                if input_text:
+                    # Safe parsing in a parallel block
+                    parallel:
+                        values = [float(x) for x in input_text.split()]
+                        for v in values:
+                            data.add(v)
+                    
+                    # Process data asynchronously
+                    result = await process_data(data)
+                    
+                    # Update GUI with results
+                    safe:
+                        setLabel("result", str(result))
+            
+            addLabel("result")
+            show()
+        }
+
+# Run the application
+app = DataProcessor()
+app.main()

@@ -1,6 +1,4 @@
 
-package cpj;
-
 import javax.swing.*;
 
 public class GUIBridge {

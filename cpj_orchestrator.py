@@ -9,10 +9,17 @@ import time
 
 def run_cpp(source_file):
     print("Compiling and running C++ code...")
-    result = subprocess.run(["g++", source_file, "-o", "cpp_out"])
+    # First compile CPJ to C++
+    result = subprocess.run(["./cpj_compiler", "--target=cpp", source_file, "-o", "generated.cpp"])
+    if result.returncode != 0:
+        print("CPJ to C++ compilation failed.")
+        return
+    # Then compile C++
+    result = subprocess.run(["g++", "generated.cpp", "-o", "cpp_out"])
     if result.returncode != 0:
         print("C++ compilation failed.")
         return
+    # Run the compiled program
     subprocess.run(["./cpp_out"])
 
 def run_python(source_file):

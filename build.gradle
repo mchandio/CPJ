@@ -1,0 +1,27 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    implementation 'org.zeromq:jeromq:0.6.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src', 'java', 'stdlib']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test', 'test/framework']
+        }
+    }
+}

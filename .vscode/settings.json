@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/me/CPJ/cpp"
+    "cmake.sourceDirectory": "/home/me/CPJ/cpp",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

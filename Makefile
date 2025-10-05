@@ -1,4 +1,3 @@
-
 CC=g++
 PYTHON=python3
 JAVAC=javac
@@ -22,8 +21,9 @@ java_deps: lib/jackson-annotations-2.15.2.jar lib/jackson-core-2.15.2.jar lib/ja
 JAVA_CP=.:lib/*
 
 java_compile: java_deps
-	@if [ -d java ]; then \
-		$(JAVAC) -cp $(JAVA_CP) -d bin java/*.java || true; \
+	@if [ -d java/src/main/java ]; then \
+		mkdir -p bin && \
+		find java/src/main/java -name "*.java" -print0 | xargs -0 $(JAVAC) -cp $(JAVA_CP) -d bin; \
 	fi
 
 run:
@@ -116,4 +116,25 @@ java-build:
 cpp-cmake:
 	@mkdir -p build && cd build && \ 
 		cmake -S .. -B . -DCPJ_BUILD_EXAMPLES=OFF || true
+
+src/runtime/memory_manager.cpp: src/runtime/memory_manager.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Add to build objects
+OBJS += src/runtime/memory_manager.o
+
+# Test framework
+test/framework/test_framework.o: test/framework/test_framework.cpp test/framework/test_framework.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+test/framework/test_examples.o: test/framework/test_examples.cpp test/framework/test_framework.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+test_runner: test/framework/test_framework.o test/framework/test_examples.o
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+test: test_runner
+	./test_runner
+
+.PHONY: test
 

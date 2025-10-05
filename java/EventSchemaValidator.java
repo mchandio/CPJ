@@ -3,16 +3,18 @@
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+// ...existing code...
 
 public class EventSchemaValidator {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Validates a JsonNode as a CPJ event. Throws IllegalArgumentException if invalid.
+     * Validates a JsonNode as a CPJ event. Throws IllegalArgumentException if
+     * invalid.
      */
     public static void validateEvent(JsonNode event) {
-        if (!event.isObject()) throw new IllegalArgumentException("Event must be a JSON object");
+        if (!event.isObject())
+            throw new IllegalArgumentException("Event must be a JSON object");
         if (!event.has("id") || !event.get("id").isTextual())
             throw new IllegalArgumentException("Event missing required string field: id");
         if (!event.has("type") || !event.get("type").isTextual())

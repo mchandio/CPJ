@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  cpj:
+    build: .
+    volumes:
+      - .:/cpj
+      - cpj_cache:/root/.cpj
+    environment:
+      - PYTHONPATH=/cpj/python
+      - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+    ports:
+      - "8000:8000" # For web-based tools
+    command: bash
+
+volumes:
+  cpj_cache:

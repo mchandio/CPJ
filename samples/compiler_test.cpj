@@ -1,0 +1,58 @@
+// Test all three language features in one file
+
+// C++ style class
+class Point {
+    var x: int;
+    var y: int;
+    
+    def Point(x: int, y: int) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    def getDistance(): float {
+        return sqrt(x * x + y * y);
+    }
+}
+
+// Python style function
+def calculate_area(points: List<Point>): float {
+    var area = 0.0;
+    for (i in range(len(points))) {
+        var j = (i + 1) % len(points);
+        area += points[i].x * points[j].y;
+        area -= points[j].x * points[i].y;
+    }
+    return abs(area) / 2;
+}
+
+// Java style main method
+public class TestProgram {
+    public static def main(args: String[]): void {
+        // Create points using C++ syntax
+        var points = [
+            Point(0, 0),
+            Point(0, 5),
+            Point(5, 5),
+            Point(5, 0)
+        ];
+        
+        // Calculate area using Python function
+        var area = calculate_area(points);
+        
+        // Print using Java System.out
+        System.out.println("Area of quadrilateral: " + area);
+        
+        // Test memory management
+        var dynamicPoint = new Point(3, 4);
+        println("Distance from origin: " + dynamicPoint.getDistance());
+        
+        // Test concurrent features
+        async {
+            var future = submitTask(() => {
+                return "Async task completed";
+            });
+            println(await future);
+        }
+    }
+}

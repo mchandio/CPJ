@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+import click
+import requests
+import json
+import os
+import hashlib
+from pathlib import Path
+
+REGISTRY_URL = "http://localhost:8000"
+CONFIG_FILE = "cpj.json"
+
+@click.group()
+def cli():
+    """CPJ Package Manager CLI"""
+    pass
+
+@cli.command()
+@click.argument('package')
+@click.option('--version', default='latest')
+def install(package, version):
+    """Install a package"""
+    try:
+        response = requests.get(f"{REGISTRY_URL}/packages/{package}/{version}")
+        response.raise_for_status()
+        
+        package_data = response.json()
+        install_package(package_data)
+        update_dependencies(package, version)
+        click.echo(f"Successfully installed {package} {version}")
+        
+    except requests.exceptions.RequestException as e:
+        click.echo(f"Error installing package: {e}", err=True)
+
+@cli.command()
+def init():
+    """Initialize a new CPJ project"""
+    if os.path.exists(CONFIG_FILE):
+        click.echo("Project already initialized")
+        return
+        
+    config = {
+        "name": os.path.basename(os.getcwd()),
+        "version": "0.1.0",
+        "dependencies": {},
+        "devDependencies": {}
+    }
+    
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config, f, indent=2)
+    
+    click.echo("Initialized CPJ project")
+
+@cli.command()
+def publish():
+    """Publish package to registry"""
+    if not os.path.exists(CONFIG_FILE):
+        click.echo("No CPJ project found", err=True)
+        return
+        
+    with open(CONFIG_FILE) as f:
+        config = json.load(f)
+    
+    files = {}
+    for path in Path('.').rglob('*'):
+        if path.is_file() and not path.name.startswith('.'):
+            with open(path, 'rb') as f:
+                files[str(path)] = f.read()
+    
+    data = {
+        'name': config['name'],
+        'version': config['version'],
+        'files': files,
+        'metadata': config
+    }
+    
+    try:
+        response = requests.post(f"{REGISTRY_URL}/packages", json=data)
+        response.raise_for_status()
+        click.echo(f"Successfully published {config['name']} {config['version']}")
+        
+    except requests.exceptions.RequestException as e:
+        click.echo(f"Error publishing package: {e}", err=True)
+
+@cli.command()
+@click.argument('query')
+def search(query):
+    """Search for packages"""
+    try:
+        response = requests.get(f"{REGISTRY_URL}/packages/search", params={'q': query})
+        response.raise_for_status()
+        
+        results = response.json()
+        if not results:
+            click.echo("No packages found")
+            return
+            
+        for pkg in results:
+            click.echo(f"{pkg['name']} ({pkg['version']})")
+            if 'description' in pkg:
+                click.echo(f"  {pkg['description']}")
+                
+    except requests.exceptions.RequestException as e:
+        click.echo(f"Error searching packages: {e}", err=True)
+
+def install_package(package_data):
+    """Install package files"""
+    for file_name, content in package_data['files'].items():
+        path = Path(file_name)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, 'wb') as f:
+            f.write(content)
+
+def update_dependencies(package, version):
+    """Update dependency list in config"""
+    if not os.path.exists(CONFIG_FILE):
+        return
+        
+    with open(CONFIG_FILE) as f:
+        config = json.load(f)
+    
+    config['dependencies'][package] = version
+    
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config, f, indent=2)
+
+if __name__ == '__main__':
+    cli()

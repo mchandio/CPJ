@@ -1,9 +1,7 @@
 // CPJ Java Module
 // Handles Java code parsing, GUI integration, compilation, and execution
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+// ...existing code...
 
 public class CPJJava {
     public static void main(String[] args) {
@@ -27,6 +25,7 @@ public class CPJJava {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
-        // Integration with other languages can be added here (e.g., via sockets, files, or JNI)
+        // Integration with other languages can be added here (e.g., via sockets, files,
+        // or JNI)
     }
 }

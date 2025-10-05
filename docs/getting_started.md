@@ -1,18 +1,26 @@
 Getting started with CPJ
 
-This quickstart gets you from checkout to running a simple CPJ sample.
+This quickstart gets you from checkout to running a simple CPJ sample in a reproducible way.
 
-Prerequisites
+Prerequisites (summary)
 
-- Linux/macOS/Windows
-- Python 3.10+
-- Java JDK (for GUI code generation and execution)
-- GNU Make
+- A POSIX shell (Linux/macOS) or Git Bash on Windows
+- Python 3.10+ (python3)
+- Java JDK 11+ (for GUI code generation and optional runtime)
+- GNU Make and a C++ toolchain (gcc/clang)
 
-Quick steps
+Recommended quickstart (one command)
+
+Run the helper script which automates a minimal dev setup (creates a virtualenv, installs Python deps, builds the compiler, and runs a non-interactive sample):
 
 ```bash
-# create and activate virtualenv (optional but recommended)
+./scripts/try_quickstart.sh
+```
+
+Manual quickstart (step-by-step)
+
+```bash
+# create and activate virtualenv (POSIX)
 python3 -m venv .venv
 source .venv/bin/activate
 
@@ -26,7 +34,7 @@ make clean && make
 ./cpj_compiler_no_run samples/types_demo.cpj
 ```
 
-If you want to run the generated GUI locally (interactive), omit the `_no_run` wrapper and run:
+To run the generated GUI interactively, omit the `_no_run` wrapper:
 
 ```bash
 ./cpj_compiler samples/types_demo.cpj

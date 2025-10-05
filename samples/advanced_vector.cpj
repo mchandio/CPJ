@@ -1,0 +1,80 @@
+# Example CPJ program demonstrating enhanced language features
+module math.vectors
+
+import collections.List
+import gui.widgets as gui
+
+# Generic interface
+interface Comparable<T> {
+    def compare(self, other: T) -> int
+}
+
+# Generic class with interface implementation
+class Vector2D<T> implements Comparable<Vector2D<T>> {
+    public x: T
+    public y: T
+
+    # Constructor with type inference
+    def __init__(self, x: T, y: T) {
+        self.x = x
+        self.y = y
+    }
+
+    # Method with error handling
+    public def magnitude(self) -> float {
+        try:
+            return (self.x * self.x + self.y * self.y).sqrt()
+        except ValueError as e:
+            throw RuntimeError("Invalid vector components")
+    }
+
+    # Interface implementation
+    public def compare(self, other: Vector2D<T>) -> int {
+        if self.magnitude() < other.magnitude():
+            return -1
+        elif self.magnitude() > other.magnitude():
+            return 1
+        return 0
+    }
+}
+
+# Main function demonstrating control flow
+def main() {
+    # List comprehension and type inference
+    vectors = [Vector2D(x, y) for x, y in [(1,2), (3,4), (5,6)]]
+    
+    # Enhanced for loop
+    for vec in vectors {
+        if vec.magnitude() > 5 {
+            print(f"Large vector: {vec}")
+        } elif vec.magnitude() > 2 {
+            print(f"Medium vector: {vec}")
+        } else {
+            print(f"Small vector: {vec}")
+        }
+    }
+
+    # GUI creation with error handling
+    try {
+        GUI VectorDisplay {
+            types {
+                "x": "float",
+                "y": "float"
+            }
+            addTextField("x")
+            addTextField("y")
+            addButton("Create", handler(x, y))
+            show()
+        }
+    } except GUIError as e {
+        print(f"GUI creation failed: {e}")
+    }
+
+    # Lambda and higher-order function
+    sortedVecs = vectors.sort(lambda a, b: a.compare(b))
+    return sortedVecs
+}
+
+if __name__ == "__main__" {
+    main()
+}

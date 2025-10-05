@@ -48,19 +48,35 @@ In-repo artifacts that show concrete progress
 
 Remaining work (prioritized)
 ----------------------------
-## CPJ Completion & Perfection TODO List (2025)
+## Enhanced Language Integration Roadmap (2025)
 
-1. **Event Model & Connector Hardening (Essential)**
-   - Robust, bi-directional event delivery (with error/reply semantics)
-   - JSON schema validation for events
-   - Async/event queue support for all runtimes
-   - Cross-runtime handler invocation (Python, C++, Java)
-   - Comprehensive integration tests
+### 1. Inter-Process Communication (IPC) Layer
+- [ ] Replace file-based communication with high-performance IPC
+  - [ ] Implement shared memory for data structures
+  - [ ] Add named pipes for event streaming
+  - [ ] Integrate ZeroMQ for message queuing
+- [ ] Implement memory-mapped files for large data transfer
+- [ ] Add binary serialization (Protocol Buffers/FlatBuffers)
 
-2. **Design IR and Backend Plan (Essential)**
-   - Internal IR (Intermediate Representation) to decouple parsing from code generation
-   - Modular backend support (C++, JVM, Python)
-   - Enables future optimizations, static analysis, and new targets
+### 2. Language-Specific Integration
+
+#### C++ Integration
+- [ ] Implement pybind11 for Python-C++ binding
+- [ ] Create direct memory access between C++ and Python
+- [ ] Develop C++ template library for type-safe bindings
+- [ ] Add JNI interface for C++-Java communication
+
+#### Python Integration
+- [ ] Enhance Python runtime with asyncio
+- [ ] Implement comprehensive type hints
+- [ ] Add Python module hot-reloading
+- [ ] Create Cython wrappers for performance-critical components
+
+#### Java Integration
+- [ ] Implement JNI for native code integration
+- [ ] Add Java Native Access (JNA) support
+- [ ] Create ByteBuffer-based shared memory access
+- [ ] Develop Java service interfaces
 
 3. **Expand LSP Features (Essential for Developer Experience)**
    - Completions, document symbols, go-to-definition, and improved diagnostics

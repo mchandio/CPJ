@@ -1,11 +1,21 @@
-print("Hello, CPJ World!")
+// Hello World in CPJ
+// This demonstrates basic output and GUI features
 
-def greet(name):
-    print("Hello " + name)
-
-GUI {
-    addLabel("Hi from CPJ")
-    addTextField("name")
-    addButton("Greet")
-    show()
+class HelloWorld {
+    def main() -> void:
+        print("Hello from CPJ!")
+        
+        // Create a GUI window
+        GUI Window:
+            types {
+                "greeting": "string",
+                "button": "widget"
+            }
+            
+            addLabel("Hello World!") as greeting
+            addButton("Click Me") as button
+            
+            on button_click from button do:
+                print("Button clicked!")
+                greeting.setText("Hello from CPJ GUI!")
 }

@@ -1,0 +1,7 @@
+class Person {
+    name: Muhammad Sidique
+    age: 28
+
+    def greet(self):
+        print("Hello, " + self.name)
+}

@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'antlr'
 }
 
 group 'org.cpj'
@@ -10,8 +11,35 @@ repositories {
 }
 
 dependencies {
+    // ANTLR dependency
+    antlr 'org.antlr:antlr4:4.13.2'
+    
     // JSON support
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    
+    // ZeroMQ support
+    implementation 'org.zeromq:jeromq:0.6.0'
+    
+    // ANTLR runtime support
+    implementation 'org.antlr:antlr4-runtime:4.13.2'
+}
+
+generateGrammarSource {
+    arguments += ['-visitor', '-listener', '-package', 'cpj.grammar.cpj.grammar']
+    outputDirectory = file('src/main/java/cpj/grammar')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
 }
 
 jar {

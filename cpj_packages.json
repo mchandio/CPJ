@@ -1,0 +1,21 @@
+{
+  "name": "my-cpj-project",
+  "version": "1.0.0",
+  "dependencies": {
+    "python": {
+      "numpy": "1.24.0",
+      "pandas": "2.1.1",
+      "requests": "2.31.0"
+    },
+    "java": {
+      "com.fasterxml.jackson.core:jackson-databind": "2.16.1",
+      "org.springframework:spring-core": "6.1.0",
+      "org.slf4j:slf4j-api": "2.0.9"
+    },
+    "cpp": {
+      "boost": "1.83.0",
+      "eigen": "3.4.0",
+      "fmt": "10.1.1"
+    }
+  }
+}

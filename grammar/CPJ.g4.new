@@ -1,0 +1,152 @@
+// ANTLR4 grammar for CPJ - Enhanced Version
+// Supports advanced type system, generics, memory safety, and concurrency
+
+grammar CPJ;
+
+// Parser rules
+program
+    : (statement | NEWLINE)* EOF
+    ;
+
+statement
+    : guiBlock
+    | funcDef
+    | classDef
+    | interfaceDef
+    | typeDef
+    | exprStmt
+    | safeBlock
+    | concurrentBlock
+    | importStmt
+    ;
+
+// Import statement for multi-language integration
+importStmt
+    : IMPORT (PYTHON | CPP | JAVA) StringLiteral (AS Identifier)? NEWLINE
+    ;
+
+// Enhanced class definition with generics, interfaces, and memory management
+classDef
+    : CLASS Identifier genericParams? (EXTENDS typeList)? (IMPLEMENTS typeList)? COLON NEWLINE
+      INDENT classBody DEDENT
+    ;
+
+// Interface definition
+interfaceDef
+    : INTERFACE Identifier genericParams? (EXTENDS typeList)? COLON NEWLINE
+      INDENT interfaceBody DEDENT
+    ;
+
+// Generic type parameters
+genericParams
+    : LT genericParamList GT
+    ;
+
+genericParamList
+    : genericParam (COMMA genericParam)*
+    ;
+
+genericParam
+    : Identifier (EXTENDS typeRef)?
+    ;
+
+// Type reference with generics support
+typeRef
+    : Identifier (LT typeRefList GT)?
+    ;
+
+typeRefList
+    : typeRef (COMMA typeRef)*
+    ;
+
+// Advanced type system
+typeDef
+    : TYPE_KW Identifier genericParams? LBRACE
+      INDENT
+      typeFieldList
+      DEDENT
+      RBRACE NEWLINE*
+    ;
+
+typeFieldList
+    : typeField (COMMA typeField)* (COMMA)?
+    ;
+
+typeField
+    : Identifier COLON typeRef (UNSAFE | SHARED | UNIQUE)?
+    ;
+
+// Enhanced function definition
+funcDef
+    : decorators?
+      (ASYNC | SAFE)? 
+      DEF Identifier genericParams? 
+      LPAREN paramList? RPAREN 
+      (ARROW typeRef)? 
+      (THROWS typeRefList)?
+      COLON (NEWLINE suite | suite)
+    ;
+
+// Decorators for cross-language integration
+decorators
+    : decorator+
+    ;
+
+decorator
+    : AT (PYTHON | CPP | JAVA | NATIVE) NEWLINE
+    ;
+
+paramList
+    : param (COMMA param)*
+    ;
+
+param
+    : Identifier COLON typeRef (UNSAFE | SHARED | UNIQUE)?
+    ;
+
+// Memory safety blocks
+safeBlock
+    : SAFE COLON NEWLINE
+      INDENT statement+ DEDENT
+    ;
+
+// Concurrent programming constructs
+concurrentBlock
+    : (ASYNC | PARALLEL) COLON NEWLINE
+      INDENT statement+ DEDENT
+    ;
+
+// Enhanced GUI support
+guiBlock
+    : GUI_KW Identifier COLON NEWLINE
+      INDENT guiBody+ DEDENT
+    | GUI_CAP LBRACE NEWLINE*
+      INDENT guiBody+ DEDENT
+      RBRACE NEWLINE*
+    ;
+
+// Rest of the existing grammar rules...
+// (Keep all the existing rules from the original grammar)
+
+// New lexer rules for enhanced features
+IMPORT: 'import';
+PYTHON: 'python';
+CPP: 'cpp';
+JAVA: 'java';
+AS: 'as';
+CLASS: 'class';
+INTERFACE: 'interface';
+EXTENDS: 'extends';
+IMPLEMENTS: 'implements';
+ASYNC: 'async';
+PARALLEL: 'parallel';
+SAFE: 'safe';
+UNSAFE: 'unsafe';
+SHARED: 'shared';
+UNIQUE: 'unique';
+THROWS: 'throws';
+NATIVE: 'native';
+AT: '@';
+
+// Rest of the existing lexer rules...
+// (Keep all the existing lexer rules from the original grammar)

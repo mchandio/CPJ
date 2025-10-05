@@ -1,92 +1,31 @@
-## User-Defined Types and Cross-Language Support
+# CPJ — Cyber Programming Jet
 
-
-CPJ now supports user-defined types using `struct` and `class` declarations, with full code generation for Python, C++, and Java backends. The type system also supports generics, type inference, and improved error messages for type errors.
-
-**Struct Example:**
-```cpj
-struct Point {
-    x: int
-    y: int
-}
-```
-
-**Generic Struct Example:**
-```cpj
-
-## CI & Quick tests
-
-This repository provides a fast quick-test target for CI and a developer-friendly `make test`:
-
-- `make ci-quick` — CI-friendly quick tests (sets `PYTHONPATH=.` and writes `reports/junit.xml`).
-- `make test` — Developer quick tests (same tests without forcing PYTHONPATH).
-
-The GitHub Actions workflow (`.github/workflows/ci.yml`) now uses `make -B ci-quick` in the matrix jobs and caches `ccache` to speed up native builds.
-
-To update the README badges (they contain placeholders for `<OWNER>/<REPO>`), run:
-
-```bash
-scripts/update_badges.sh <OWNER>/<REPO>
-```
-struct Box<T> {
-    value: T
-}
-```
-
-**Class Example:**
-```cpj
-class Person {
-    name: string
-    age: int
-
-    def greet(self):
-        print("Hello, " + self.name)
-}
-```
-
-**Type Inference Example:**
-```cpj
-def add(a: int, b: int) -> int {
-    return a + b
-}
-x = add(1, 2)  # x inferred as int
-```
-
-**Improved Type Error Messages:**
-The type checker now provides detailed error messages with context for handler calls, assignments, and generics. Example:
-
-```
-Type Error: Field 'foo' not found in any user-defined type or generic. Assignment: mybox.foo = ... (inferred type: Box<int>)
-Handler Error: 'greet' expects 2 args, got 1. Button: addButton("Greet", greet(name))
-```
-
-These features are available in all generated backends, enabling seamless cross-language data structures, OOP, and safer code.
-
-See `samples/advanced_types.cpj` for a full example using user-defined types, generics, type inference, GUI, and event handling.
-````markdown
 [![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
 [![Python tests](https://github.com/<OWNER>/<REPO>/actions/workflows/python-tests.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/python-tests.yml)
 [![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
 [![Coverage](https://codecov.io/gh/<OWNER>/<REPO>/branch/main/graph/badge.svg)](https://codecov.io/gh/<OWNER>/<REPO>)
 
-<!--
+CPJ is a tri-language compiler and development environment that targets C++, Python, and Java. It includes a C++ core compiler, Python runtime helpers, and Java GUI generation support.
 
-        Badges use placeholder `<OWNER>/<REPO>`. Replace the placeholder with your GitHub
-        repository path (for example `myuser/cpj`). Example (from repo root):
+Canonical Quickstart
 
-        sed -i 's|<OWNER>/<REPO>|myuser/cpj|g' README.md
+The easiest way to get started is the quickstart script that automates a minimal local setup (creates a virtualenv, installs Python deps, builds the C++ compiler, and runs a non-interactive sample):
 
-    If your repo is private and Codecov requires a token, add a `CODECOV_TOKEN`
-    secret in the repository settings and the Codecov action will pick it up.
--->
+```bash
+./scripts/try_quickstart.sh
+```
 
-    Alternatively you can run the small helper script to replace badges:
+If you prefer to run the steps manually, see `docs/getting_started.md` for platform notes and step-by-step commands.
 
-    ```bash
-    scripts/update_badges.sh <OWNER>/<REPO>
-    ```
+Badges
 
-x = add(5, 7)
+The badge URLs in this README use the placeholder `<OWNER>/<REPO>`. To update them for your repository, replace the placeholder (example from repo root):
+
+```bash
+sed -i 's|<OWNER>/<REPO>|myuser/cpj|g' README.md
+```
+
+Alternatively the repo includes `scripts/update_badges.sh` which replaces the placeholders for you.
 
 # CPJ Language and Compiler Documentation
 
@@ -254,6 +193,20 @@ If you prefer an alternative approach, you can also run tests inside a proper CI
 set up a headless Java environment; the wrapper is a small convenience to keep on-disk
 artifacts and runtime behavior unchanged.
 
+## Quickstart
+
+1. Install CPJ (see `docs/installation.md`)
+2. Write your first program in `.cpj` file
+3. Use the orchestrator to compile and run code in C++, Python, or Java
+
+## Learning Resources
+- [Language Reference](docs/language_reference.md)
+- [Getting Started Guide](docs/getting_started.md)
+- [Migration Guide](docs/migration_guide.md)
+- [Interactive Tutorials](docs/tutorials/)
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/community.md](docs/community.md)
+
 ---
 For questions or contributions, see the project README or contact the maintainer.
-````

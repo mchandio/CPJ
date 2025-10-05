@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.io.*;
+// ...existing code...
 
 public class GeneratedFarmflow extends JFrame {
     private Map<String, JTextField> fields = new HashMap<>();
