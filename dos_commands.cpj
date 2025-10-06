@@ -1,0 +1,195 @@
+"""
+CPJ-DOS Command Implementations
+Provides implementations of standard DOS commands
+"""
+
+class DOSCommands {
+    private:
+        fs: FileSystem
+        
+    public:
+        def __init__(self, fileSystem: FileSystem) {
+            self.fs = fileSystem
+        }
+        
+        def dir(self, path: str = "") -> void {
+            """List directory contents"""
+            print(" Volume in drive C has no label")
+            print(" Directory of " + path if path else "C:\\")
+            print("")
+            
+            totalFiles = 0
+            totalBytes = 0
+            
+            for entry in self.fs.rootDirectory {
+                if entry.attributes & ATTR_DIRECTORY {
+                    print(f"<DIR>    {entry.name}")
+                } else {
+                    print(f"{entry.size:8d} {entry.name}")
+                    totalFiles += 1
+                    totalBytes += entry.size
+                }
+            }
+            
+            print(f"{totalFiles} File(s) {totalBytes:,d} bytes")
+            print(f"{self.fs.freeClusterCount * CLUSTER_SIZE:,d} bytes free")
+        }
+        
+        def type(self, filename: str) -> void {
+            """Display file contents"""
+            entry = self.fs.findFile(filename)
+            if entry is None {
+                print("File not found")
+                return
+            }
+            
+            if entry.attributes & ATTR_DIRECTORY {
+                print("Access denied")
+                return
+            }
+            
+            data = self.fs.readFile(entry)
+            print(data.decode('ascii', errors='replace'))
+        }
+        
+        def copy(self, source: str, dest: str) -> void {
+            """Copy file"""
+            srcEntry = self.fs.findFile(source)
+            if srcEntry is None {
+                print(f"File not found - {source}")
+                return
+            }
+            
+            data = self.fs.readFile(srcEntry)
+            destEntry = self.fs.createFile(dest, srcEntry.attributes)
+            
+            if destEntry is None {
+                print("Unable to create destination file")
+                return
+            }
+            
+            if not self.fs.writeFile(destEntry, data) {
+                print("Write error")
+                self.fs.deleteFile(dest)
+                return
+            }
+            
+            print(f"1 file(s) copied")
+        }
+        
+        def del_(self, pattern: str) -> void {
+            """Delete file(s)"""
+            import fnmatch
+            
+            deleted = 0
+            for entry in self.fs.rootDirectory[:] {
+                if fnmatch.fnmatch(entry.name, pattern.upper()) {
+                    if entry.attributes & ATTR_DIRECTORY {
+                        continue
+                    }
+                    if self.fs.deleteFile(entry.name) {
+                        deleted += 1
+                    }
+                }
+            }
+            
+            print(f"{deleted} file(s) deleted")
+        }
+        
+        def md(self, dirname: str) -> void {
+            """Make directory"""
+            entry = self.fs.createFile(dirname, ATTR_DIRECTORY)
+            if entry is None {
+                print("Unable to create directory")
+            }
+        }
+        
+        def rd(self, dirname: str) -> void {
+            """Remove directory"""
+            entry = self.fs.findFile(dirname)
+            if entry is None {
+                print("Directory not found")
+                return
+            }
+            
+            if not (entry.attributes & ATTR_DIRECTORY) {
+                print("Not a directory")
+                return
+            }
+            
+            # Check if empty
+            for e in self.fs.rootDirectory {
+                parentDir = "\\".join(e.name.split("\\")[:-1])
+                if parentDir == dirname {
+                    print("Directory not empty")
+                    return
+                }
+            }
+            
+            if not self.fs.deleteFile(dirname) {
+                print("Unable to remove directory")
+            }
+        }
+        
+        def rename(self, source: str, dest: str) -> void {
+            """Rename file"""
+            srcEntry = self.fs.findFile(source)
+            if srcEntry is None {
+                print("File not found")
+                return
+            }
+            
+            if self.fs.findFile(dest) is not None {
+                print("File already exists")
+                return
+            }
+            
+            srcEntry.name = dest.upper()
+            print("1 file(s) renamed")
+        }
+        
+        def attrib(self, filename: str, attrs: str) -> void {
+            """Change file attributes"""
+            entry = self.fs.findFile(filename)
+            if entry is None {
+                print("File not found")
+                return
+            }
+            
+            for attr in attrs {
+                match attr.upper() {
+                    case "+R":
+                        entry.attributes |= ATTR_READONLY
+                    case "-R":
+                        entry.attributes &= ~ATTR_READONLY
+                    case "+H":
+                        entry.attributes |= ATTR_HIDDEN
+                    case "-H":
+                        entry.attributes &= ~ATTR_HIDDEN
+                    case "+S":
+                        entry.attributes |= ATTR_SYSTEM
+                    case "-S":
+                        entry.attributes &= ~ATTR_SYSTEM
+                    case "+A":
+                        entry.attributes |= ATTR_ARCHIVE
+                    case "-A":
+                        entry.attributes &= ~ATTR_ARCHIVE
+                }
+            }
+        }
+        
+        def help(self) -> void {
+            """Display help information"""
+            print("ATTRIB   Displays or changes file attributes")
+            print("CD       Displays the name of or changes the current directory")
+            print("COPY     Copies one or more files")
+            print("DEL      Deletes one or more files")
+            print("DIR      Displays a list of files and subdirectories")
+            print("EXIT     Quits the DOS shell")
+            print("HELP     Provides Help information for DOS commands")
+            print("MD       Creates a directory")
+            print("RD       Removes a directory")
+            print("RENAME   Renames a file or files")
+            print("TYPE     Displays the contents of a text file")
+        }
+}

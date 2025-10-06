@@ -1,0 +1,3 @@
+package cpj.grammar;
+
+// ...existing generated code moved here (original contents preserved) ...

@@ -1,0 +1,216 @@
+"""
+CPJ-DOS File System Implementation
+Provides FAT-like file system functionality
+"""
+
+# File system constants
+const SECTOR_SIZE: int = 512
+const CLUSTER_SIZE: int = 2048  # 4 sectors per cluster
+const FAT_ENTRIES: int = 4096   # Support up to 4096 clusters
+
+# File system structures
+type FatEntry {
+    next: int,      # Next cluster in chain (-1 for end)
+    used: bool      # Whether cluster is used
+}
+
+type DirectoryEntry {
+    name: str,          # 8.3 format name
+    attributes: int,    # File attributes
+    firstCluster: int,  # First cluster of file
+    size: int,         # File size in bytes
+    createDate: int,   # Creation date
+    createTime: int,   # Creation time
+    modifyDate: int,   # Last modification date
+    modifyTime: int    # Last modification time
+}
+
+class FileSystem {
+    private:
+        fat: List[FatEntry]           # File Allocation Table
+        rootDirectory: List[DirectoryEntry]  # Root directory entries
+        data: bytearray               # Disk data
+        freeClusterCount: int        # Number of free clusters
+    
+    public:
+        def __init__(self) {
+            self.fat = []
+            self.rootDirectory = []
+            self.data = bytearray(CLUSTER_SIZE * FAT_ENTRIES)
+            self.freeClusterCount = FAT_ENTRIES
+            self.initializeFileSystem()
+        }
+        
+        def initializeFileSystem(self) -> void {
+            # Initialize FAT
+            for i in range(FAT_ENTRIES) {
+                self.fat.append(FatEntry(next=-1, used=false))
+            }
+            
+            # Mark system areas as used
+            self.fat[0].used = true  # Reserved for system
+            self.freeClusterCount -= 1
+        }
+        
+        def createFile(self, name: str, attributes: int) -> Optional[DirectoryEntry] {
+            # Check if file already exists
+            if self.findFile(name) is not None:
+                return None
+                
+            # Find free directory entry
+            if len(self.rootDirectory) >= 224:  # Max root directory entries
+                return None
+                
+            # Create directory entry
+            entry = DirectoryEntry(
+                name=name.upper(),
+                attributes=attributes,
+                firstCluster=self.allocateCluster(),
+                size=0,
+                createDate=self.getCurrentDate(),
+                createTime=self.getCurrentTime(),
+                modifyDate=self.getCurrentDate(),
+                modifyTime=self.getCurrentTime()
+            )
+            
+            if entry.firstCluster == -1:
+                return None
+                
+            self.rootDirectory.append(entry)
+            return entry
+        }
+        
+        def writeFile(self, entry: DirectoryEntry, data: bytes) -> bool {
+            if len(data) == 0:
+                return true
+                
+            # Calculate needed clusters
+            neededClusters = (len(data) + CLUSTER_SIZE - 1) // CLUSTER_SIZE
+            if neededClusters > self.freeClusterCount:
+                return false
+                
+            # Write data clusters
+            currentCluster = entry.firstCluster
+            dataOffset = 0
+            
+            while dataOffset < len(data) {
+                # Write cluster data
+                clusterData = data[dataOffset:dataOffset + CLUSTER_SIZE]
+                self.writeCluster(currentCluster, clusterData)
+                dataOffset += CLUSTER_SIZE
+                
+                if dataOffset < len(data) {
+                    # Allocate next cluster
+                    nextCluster = self.allocateCluster()
+                    if nextCluster == -1:
+                        return false
+                    self.fat[currentCluster].next = nextCluster
+                    currentCluster = nextCluster
+                }
+            }
+            
+            entry.size = len(data)
+            entry.modifyDate = self.getCurrentDate()
+            entry.modifyTime = self.getCurrentTime()
+            return true
+        }
+        
+        def readFile(self, entry: DirectoryEntry) -> bytes {
+            if entry.size == 0:
+                return bytes()
+                
+            result = bytearray()
+            currentCluster = entry.firstCluster
+            
+            while currentCluster != -1 and len(result) < entry.size {
+                # Read cluster data
+                clusterData = self.readCluster(currentCluster)
+                result.extend(clusterData)
+                currentCluster = self.fat[currentCluster].next
+            }
+            
+            return bytes(result[:entry.size])
+        }
+        
+        def deleteFile(self, name: str) -> bool {
+            entry = self.findFile(name)
+            if entry is None:
+                return false
+                
+            # Free clusters
+            currentCluster = entry.firstCluster
+            while currentCluster != -1 {
+                nextCluster = self.fat[currentCluster].next
+                self.freeCluster(currentCluster)
+                currentCluster = nextCluster
+            }
+            
+            # Remove directory entry
+            self.rootDirectory.remove(entry)
+            return true
+        }
+        
+        # Utility methods
+        def allocateCluster(self) -> int {
+            if self.freeClusterCount == 0:
+                return -1
+                
+            for i in range(FAT_ENTRIES) {
+                if not self.fat[i].used {
+                    self.fat[i].used = true
+                    self.fat[i].next = -1
+                    self.freeClusterCount -= 1
+                    return i
+                }
+            }
+            return -1
+        }
+        
+        def freeCluster(self, cluster: int) -> void {
+            if cluster >= 0 and cluster < FAT_ENTRIES {
+                self.fat[cluster].used = false
+                self.fat[cluster].next = -1
+                self.freeClusterCount += 1
+            }
+        }
+        
+        def writeCluster(self, cluster: int, data: bytes) -> void {
+            offset = cluster * CLUSTER_SIZE
+            self.data[offset:offset + len(data)] = data
+        }
+        
+        def readCluster(self, cluster: int) -> bytes {
+            offset = cluster * CLUSTER_SIZE
+            return bytes(self.data[offset:offset + CLUSTER_SIZE])
+        }
+        
+        def findFile(self, name: str) -> Optional[DirectoryEntry] {
+            name = name.upper()
+            for entry in self.rootDirectory {
+                if entry.name == name:
+                    return entry
+            }
+            return None
+        }
+        
+        def getCurrentDate(self) -> int {
+            # Format: YYYYMMDD
+            import time
+            t = time.localtime()
+            return t.tm_year * 10000 + t.tm_mon * 100 + t.tm_mday
+        }
+        
+        def getCurrentTime(self) -> int {
+            # Format: HHMMSS
+            import time
+            t = time.localtime()
+            return t.tm_hour * 10000 + t.tm_min * 100 + t.tm_sec
+        }
+}
+
+# File attributes
+const ATTR_READONLY: int = 0x01
+const ATTR_HIDDEN: int = 0x02
+const ATTR_SYSTEM: int = 0x04
+const ATTR_DIRECTORY: int = 0x10
+const ATTR_ARCHIVE: int = 0x20

@@ -6,6 +6,40 @@ fall back to writing a simple event when no handler is available.
 import json
 from typing import Any, Iterable, Optional
 
+from cpj_parser import CPJParserIntegration, CPJParseError
+from cpj_house_runtime import WindowManager, DoorManager, LightManager
+from cpj_enums import AccessLevel
+
+
+class CPJRuntime:
+    def __init__(self):
+        self.window_manager = WindowManager()
+        self.door_manager = DoorManager()
+        self.light_manager = LightManager()
+        self.current_access_level = AccessLevel.PUBLIC
+    
+    def parse_cpj_code(self, code: str) -> Any:
+        """Parse CPJ code and return the parse tree"""
+        parser = CPJParserIntegration()
+        return parser.parse_code(code)
+    
+    def set_access_level(self, level: AccessLevel):
+        """Set the current access level for operations"""
+        self.current_access_level = level
+    
+    def inspect_value(self, target: str) -> Optional[dict]:
+        """Inspect a value through a window"""
+        return self.window_manager.inspect(target, self.current_access_level)
+    
+    def request_access(self, door_name: str, caller: str, args: list) -> bool:
+        """Request access through a door"""
+        return self.door_manager.request_access(
+            door_name, caller, args, self.current_access_level)
+    
+    def emit_light(self, light_name: str, message: str, **kwargs):
+        """Emit a message through a light"""
+        self.light_manager.emit(light_name, message, **kwargs)
+
 
 def gather_widget_data(widgets, widget_types=None) -> dict:
     """Collect values from a widgets mapping.

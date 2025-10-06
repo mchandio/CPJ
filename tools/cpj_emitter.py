@@ -7,24 +7,41 @@ import re
 from tools.cpj_parser import Module, ClassDef, FuncDef, Print, Assign, Return, Call, Str, Num, Var, BinOp, GUIBlock, If, UnaryOp, Compare, BoolOp, parse_file, parse_expr_text
 
 class Emitter:
-	def __init__(self):
-		self.lines = []
-		# helper counter for generated handlers
-		self._btn_counter = 0
+    def __init__(self):
+        self.lines = []
+        self._btn_counter = 0
+        self.imports = set()
+        self.type_imports = {
+            'List': 'typing.List',
+            'Dict': 'typing.Dict',
+            'Optional': 'typing.Optional',
+        }
 
-	def emit(self, node, indent=0):
-		method = getattr(self, f'emit_{node.__class__.__name__}', None)
-		if method:
-			method(node, indent)
-		else:
-			self.emit_comment(f"Unsupported node: {node}", indent)
+    def emit(self, node, indent=0):
+        method = getattr(self, f'emit_{node.__class__.__name__}', None)
+        if method:
+            method(node, indent)
+        else:
+            self.emit_comment(f"Unsupported node: {node}", indent)
 
-	def emit_comment(self, text, indent=0):
-		self.lines.append("    " * indent + f"# {text}")
+    def emit_comment(self, text, indent=0):
+        self.lines.append("    " * indent + f"# {text}")
 
-	def emit_Module(self, node, indent=0):
-		for it in node.items:
-			self.emit(it, indent)
+    def emit_Module(self, node, indent=0):
+        # Add necessary imports
+        if self.imports:
+            for imp in sorted(self.imports):
+                self.lines.append(f'import {imp}')
+            self.lines.append('')
+            
+        for it in node.items:
+            self.emit(it, indent)
+            
+        # Emit type imports if needed
+        if any(t in self.type_imports for t in self.imports):
+            type_imports = [self.type_imports[t] for t in self.imports if t in self.type_imports]
+            if type_imports:
+                self.lines.insert(0, f'from {', '.join(type_imports)} import {', '.join(t.split('.')[-1] for t in type_imports)}')
 
 		# After emitting all top-level items, auto-invoke main if present.
 		# Prefer a top-level function `main()`; otherwise call a class `main` as a static method.

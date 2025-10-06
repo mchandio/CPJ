@@ -4,8 +4,8 @@
 # then run this script. It requires Java.
 
 set -euo pipefail
-DEFAULT_JAR_OLD=grammar/antlr-4.12.0-complete.jar
-DEFAULT_JAR_NEW=grammar/antlr-4.13.2-complete.jar
+DEFAULT_JAR_OLD=antlr-4.12.0-complete.jar
+DEFAULT_JAR_NEW=antlr-4.13.2-complete.jar
 if [ -n "${1:-}" ]; then
   ANTLR_JAR=$1
 elif [ -f "$DEFAULT_JAR_NEW" ]; then
@@ -22,7 +22,7 @@ if [ ! -f "$ANTLR_JAR" ]; then
 fi
 
 mkdir -p "$OUT_DIR"
-java -jar "$ANTLR_JAR" -Dlanguage=Python3 -o "$OUT_DIR" grammar/CPJ.g4
+java -jar "$ANTLR_JAR" -Dlanguage=Python3 -o "$OUT_DIR" CPJ.g4
 
 echo "Generated parser files in $OUT_DIR"
 

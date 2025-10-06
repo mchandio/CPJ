@@ -1,6 +1,5 @@
-// ANTLR4 grammar for a CPJ subset (initial draft)
-// Captures GUI block, widget statements, types maps (token and dict-style), and expressions
-// This grammar is intended as a starting point for migrating or generating a parser.
+// ANTLR4 grammar for CPJ language
+// Supports mixed Python, C++, and Java syntax styles
 
 grammar CPJ;
 
@@ -13,7 +12,14 @@ statement
     : guiBlock
     | funcDef
     | typeDef
-    | exprStmt
+    | eventHandler
+    | exprStmt SEMICOLON?
+    | cppStyleBlock
+    ;
+
+// Event handler definition
+eventHandler
+    : ON eventName=Identifier (FROM source=Identifier)? DO COLON NEWLINE suite
     ;
 
 // User-defined type declaration
@@ -32,7 +38,13 @@ typeField
 
 // Function definition with optional type annotations and return type
 funcDef
-    : DEF Identifier LPAREN paramList? RPAREN (ARROW Identifier)? COLON (NEWLINE suite | suite)
+    : (PUBLIC? STATIC?)? DEF Identifier LPAREN paramList? RPAREN (ARROW typeRef)? (COLON (NEWLINE suite | suite) | cppStyleBlock)
+    ;
+
+typeRef
+    : Identifier                           // Simple type
+    | Identifier LBRACKET typeRef RBRACKET  // Array/List type
+    | VOID                                  // Void type
     ;
 
 paramList
@@ -43,8 +55,21 @@ param
     : Identifier (COLON Identifier)?
     ;
 // New lexer tokens for type system
+// Keywords
 TYPE_KW: [tT][yY][pP][eE] ;
 ARROW: '->' ;
+ON: [oO][nN] ;
+FROM: [fF][rR][oO][mM] ;
+DO: [dD][oO] ;
+PUBLIC: [pP][uU][bB][lL][iI][cC] ;
+STATIC: [sS][tT][aA][tT][iI][cC] ;
+NEW: [nN][eE][wW] ;
+VOID: [vV][oO][iI][dD] ;
+
+// Operators and punctuation
+SEMICOLON: ';' ;
+LBRACKET: '[' ;
+RBRACKET: ']' ;
 
 suite
     : INDENT NEWLINE* statement+ DEDENT
@@ -56,13 +81,42 @@ simpleStmt
     ;
 
 exprStmt
-    : expression NEWLINE
+    : expression NEWLINE?
+    ;
+
+cppStyleBlock
+    : LBRACE NEWLINE* (statement SEMICOLON? NEWLINE?)* RBRACE NEWLINE?
+    ;
+
+expression
+    : literal                                  // Literal values
+    | Identifier                              // Variable reference
+    | arrayExpr                               // Array literal
+    | expression LBRACKET expression RBRACKET  // Array access
+    | NEW typeRef LPAREN exprList? RPAREN     // Object creation
+    | expression DOT Identifier               // Member access
+    | expression LPAREN exprList? RPAREN      // Function call
+    | expression (MUL | DIV) expression       // Multiplicative
+    | expression (PLUS | MINUS) expression    // Additive
+    | expression ASSIGN expression            // Assignment
+    ;
+
+exprList
+    : expression (COMMA expression)*
+    ;
+
+exprList
+    : expression (COMMA expression)*
+    ;
+
+arrayExpr
+    : LBRACKET (expression (COMMA expression)*)? RBRACKET
     ;
 
 // GUI block
 guiBlock
-    : GUI_KW Identifier COLON NEWLINE INDENT guiBody+ DEDENT
-    | GUI_CAP LBRACE NEWLINE* INDENT guiBody+ DEDENT RBRACE NEWLINE*
+    : GUI_KW Identifier COLON NEWLINE INDENT (guiBody | eventHandler)+ DEDENT
+    | GUI_CAP LBRACE NEWLINE* INDENT (guiBody | eventHandler)+ DEDENT RBRACE NEWLINE*
     ;
 
 guiBody
@@ -199,3 +253,99 @@ argList
 callStmt
     : dottedName '(' argList? ')' (NEWLINE | INDENT | DEDENT)?
     ;
+
+
+dottedName
+    : Identifier (DOT Identifier)*
+    ;
+
+literal
+    : Integer
+    | Float
+    | StringLiteral
+    | TRUE | FALSE | NULL
+    ;
+
+// Lexer rules
+
+// Structural tokens
+NEWLINE: ('\r'? '\n')+ ;
+INDENT: '<INDENT>' ;
+DEDENT: '<DEDENT>' ;
+
+// Punctuation and operators (named tokens to avoid ambiguous implicit numbering)
+LPAREN: '(' ;
+RPAREN: ')' ;
+COLON: ':' ;
+COMMA: ',' ;
+LBRACE: '{' ;
+RBRACE: '}' ;
+DOT: '.' ;
+
+PLUS: '+' ;
+MINUS: '-' ;
+STAR: '*' ;
+DIV: '/' ;
+MOD: '%' ;
+POW: '**' ;
+TILDE: '~' ;
+
+LT: '<' ;
+GT: '>' ;
+LE: '<=' ;
+GE: '>=' ;
+EQ: '==' ;
+NEQ: '!=' ;
+LSHIFT: '<<' ;
+RSHIFT: '>>' ;
+BITOR: '|' ;
+BITXOR: '^' ;
+BITAND: '&' ;
+
+// Keywords and widget names
+// Keywords (case-insensitive where appropriate). Widget function names are case-sensitive.
+DEF: [dD][eE][fF] ;
+GUI_CAP: 'GUI' ;
+GUI_KW: [gG][uU][iI] ;
+TYPES_KW: [tT][yY][pP][eE][sS] ;
+ADD_TEXT: 'addTextField' ;
+ADD_BTN: 'addButton' ;
+ADD_CHECK: 'addCheckBox' ;
+ADD_SLIDER: 'addSlider' ;
+OR: [oO][rR] ;
+AND: [aA][nN][dD] ;
+IN: [iI][nN] ;
+IS: [iI][sS] ;
+TRUE: [tT][rR][uU][eE] ;
+FALSE: [fF][aA][lL][sS][eE] ;
+NULL: [nN][uU][lL][lL] ;
+
+// Numeric literals: Float must come before Integer so multi-part numbers are matched first.
+fragment DIGIT: [0-9] ;
+fragment DIGITS: DIGIT+ ;
+
+Float
+    : DIGITS '.' DIGITS? ([eE] [+-]? DIGITS)?
+    | '.' DIGITS ([eE] [+-]? DIGITS)?
+    | DIGITS [eE] [+-]? DIGITS
+    ;
+
+Integer: DIGITS ;
+StringLiteral
+    : '"' (~["\\] | '\\' .)* '"'
+    | '\'' (~['\\] | '\\' .)* '\''
+    ;
+
+Identifier
+    : [a-zA-Z_][a-zA-Z0-9_]*
+    ;
+
+COMMENT
+    : '#' ~[\r\n]* -> skip
+    ;
+
+WS: [ \t]+ -> channel(HIDDEN) ;
+
+// Note: Real indentation-sensitive grammar requires custom handling or the Python-style
+// INDENT/DEDENT preprocessing used by the ANTLR Python grammar. Here we use placeholders
+// to indicate block structure; a later pass should replace them with real handling.

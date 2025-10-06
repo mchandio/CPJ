@@ -1,4 +1,4 @@
-package src.main.java.cpj.test;
+package cpj.test;
 
 import java.util.ArrayList;
 import java.util.List;

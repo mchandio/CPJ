@@ -1,2 +1,3 @@
 astroid
 antlr4-python3-runtime
+pygls

@@ -1,0 +1,28 @@
+# Test program for CPJ-DOS
+
+def main() -> void {
+    print("Testing DOS memory management")
+    
+    # Create a test process
+    pid = MemoryManager().createProcess("TEST_APP", priority=1)
+    
+    # Allocate some memory
+    segment = MemoryManager().allocateMemory(pid, 16384)  # 16K
+    
+    if segment != None {
+        print(f"Allocated {segment.size} bytes at {hex(segment.base)}")
+        
+        # Show memory stats
+        DOSShell().executeCommand("MEM")
+        
+        # Show running tasks
+        DOSShell().executeCommand("TASKS")
+        
+        # Free memory
+        MemoryManager().freeMemory(pid)
+    } else {
+        print("Memory allocation failed")
+    }
+}
+
+main()

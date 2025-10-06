@@ -5,6 +5,17 @@ project(CPJ VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Platform-independent settings
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(BUILD_SHARED_LIBS ON)
+
+# Enable LTO (Link Time Optimization) for better cross-platform performance
+include(CheckIPOSupported)
+check_ipo_supported(RESULT supported OUTPUT error)
+if(supported)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 # Platform-specific settings
 if(WIN32)
     add_definitions(-DWIN32_LEAN_AND_MEAN)
@@ -13,29 +24,18 @@ elseif(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif()
 
-# Add subdirectories
-add_subdirectory(src)
-add_subdirectory(test)
-
-# Main CPJ library
-add_library(cpj SHARED
-    src/runtime/memory_manager.cpp
-    src/frontend/java/SemanticAnalyzer.cpp
-    # Add other source files
-)
+# Ensure platform-independent paths
+file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}" BINARY_DIR)
+file(TO_CMAKE_PATH "${PROJECT_SOURCE_DIR}" SOURCE_DIR)
 
 # CPJ compiler executable
 add_executable(cpj_compiler
     cpj_compiler.cpp
 )
 
-target_link_libraries(cpj_compiler PRIVATE cpj)
-
 # Install rules
-install(TARGETS cpj cpj_compiler
+install(TARGETS cpj_compiler
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
 )
 
 # Package configuration

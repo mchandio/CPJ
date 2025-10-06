@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'antlr'
+    id 'application'
 }
 
 group 'org.cpj'
@@ -15,13 +16,28 @@ dependencies {
     antlr 'org.antlr:antlr4:4.13.2'
     
     // JSON support
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
     
     // ZeroMQ support
     implementation 'org.zeromq:jeromq:0.6.0'
     
     // ANTLR runtime support
     implementation 'org.antlr:antlr4-runtime:4.13.2'
+    
+    // Testing
+    testImplementation platform('org.junit:junit-bom:5.8.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.8.1'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperty 'java.awt.headless', 'false'
 }
 
 generateGrammarSource {
@@ -34,10 +50,16 @@ sourceSets {
         java {
             srcDirs = ['src/main/java']
         }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
     }
     test {
         java {
             srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
         }
     }
 }
@@ -48,3 +70,43 @@ jar {
                    'Implementation-Version': version
     }
 }
+
+application {
+    mainClass = 'cpj.java.CPJJava'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
+
+// Custom task to create init script directory
+task createInitScriptDir {
+    def initScriptDir = new File(System.getProperty('user.home'), '.config/Code/User/globalStorage/redhat.java/1.46.0/config_linux/org.eclipse.osgi/58/0/.cp/gradle/init')
+    doLast {
+        initScriptDir.mkdirs()
+    }
+}
+
+// Custom task to create init script
+task createInitScript {
+    dependsOn createInitScriptDir
+    def initScriptFile = new File(System.getProperty('user.home'), '.config/Code/User/globalStorage/redhat.java/1.46.0/config_linux/org.eclipse.osgi/58/0/.cp/gradle/init/init.gradle')
+    doLast {
+        initScriptFile.text = '''
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+'''
+    }
+}
+
+// Make sure init script is created before build
+build.dependsOn createInitScript

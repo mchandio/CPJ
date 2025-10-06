@@ -30,6 +30,16 @@ run:
 	# Run the compiler against the sample CPJ program. Adjust the path as needed.
 	./cpj_compiler samples/demo.cpj || true
 
+# Build and run the DOS system
+.PHONY: dos
+dos: cpj_compiler python-install
+	@echo "Building DOS system..."
+	./cpj_compiler dos_shell.cpj
+	./cpj_compiler dos_filesystem.cpj
+	./cpj_compiler dos_memory.cpj
+	@echo "Starting CPJ-DOS..."
+	.venv/bin/python -c "from dos_shell import DOSShell; DOSShell().run()"
+
 
 # Build the compiler and run a CPJ sample end-to-end (emit + run).
 .PHONY: run-sample

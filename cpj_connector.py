@@ -13,7 +13,13 @@ import time
 import uuid
 import threading
 import queue
-
+import pkg_resources
+import subprocess
+import sys
+import re
+from typing import Dict, List, Set
+import importlib
+import importlib.util
 
 import jsonschema
 import os
@@ -21,6 +27,111 @@ import os
 EVENT_FILE = '/tmp/cpj_event.json'
 REPLY_FILE = '/tmp/cpj_event_reply.json'
 EVENT_QUEUE_FILE = '/tmp/cpj_event_queue.jsonl'  # For async event queue
+
+# Dependency management
+PYTHON_DEPS_FILE = 'requirements.txt'
+CPP_DEPS_FILE = 'conanfile.txt'
+JAVA_DEPS_FILE = 'pom.xml'
+
+class DependencyManager:
+    def __init__(self):
+        self.python_deps: Set[str] = set()
+        self.cpp_deps: Set[str] = set()
+        self.java_deps: Set[str] = set()
+        self._load_existing_deps()
+    
+    def _load_existing_deps(self):
+        """Load existing dependencies from files"""
+        if os.path.exists(PYTHON_DEPS_FILE):
+            with open(PYTHON_DEPS_FILE) as f:
+                self.python_deps.update(line.strip() for line in f if line.strip())
+        
+        if os.path.exists(CPP_DEPS_FILE):
+            with open(CPP_DEPS_FILE) as f:
+                self.cpp_deps.update(
+                    line.strip() for line in f 
+                    if line.strip() and not line.startswith('#')
+                )
+        
+        if os.path.exists(JAVA_DEPS_FILE):
+            # Parse Maven dependencies
+            import xml.etree.ElementTree as ET
+            if os.path.exists(JAVA_DEPS_FILE):
+                tree = ET.parse(JAVA_DEPS_FILE)
+                root = tree.getroot()
+                for dep in root.findall('.//dependency'):
+                    group_id = dep.find('groupId').text
+                    artifact_id = dep.find('artifactId').text
+                    version = dep.find('version').text
+                    self.java_deps.add(f'{group_id}:{artifact_id}:{version}')
+    
+    def detect_python_imports(self, code: str) -> Set[str]:
+        """Detect Python package imports from code"""
+        imports = set()
+        for line in code.split('\n'):
+            if line.strip().startswith(('import ', 'from ')):
+                module = line.split()[1].split('.')[0]
+                if module not in ('os', 'sys', 'time', 'json', 'threading', 'queue'):
+                    imports.add(module)
+        return imports
+    
+    def detect_cpp_includes(self, code: str) -> Set[str]:
+        """Detect C++ includes from code"""
+        includes = set()
+        for line in code.split('\n'):
+            if line.strip().startswith('#include'):
+                header = line.split('<')[-1].split('>')[0]
+                if not header.endswith('.h'):
+                    includes.add(header)
+        return includes
+    
+    def detect_java_imports(self, code: str) -> Set[str]:
+        """Detect Java package imports from code"""
+        imports = set()
+        for line in code.split('\n'):
+            if line.strip().startswith('import '):
+                package = line.split()[1].split('.')[0]
+                if package not in ('java', 'javax'):
+                    imports.add(package)
+        return imports
+    
+    def install_python_deps(self, deps: Set[str]):
+        """Install Python dependencies using pip"""
+        if deps:
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install'] + list(deps))
+            with open(PYTHON_DEPS_FILE, 'a') as f:
+                for dep in deps:
+                    f.write(f'{dep}\n')
+    
+    def install_cpp_deps(self, deps: Set[str]):
+        """Install C++ dependencies using conan"""
+        if deps:
+            with open(CPP_DEPS_FILE, 'a') as f:
+                for dep in deps:
+                    f.write(f'{dep}\n')
+            subprocess.check_call(['conan', 'install', '.'])
+    
+    def install_java_deps(self, deps: Set[str]):
+        """Add Java dependencies to pom.xml"""
+        if deps and os.path.exists(JAVA_DEPS_FILE):
+            import xml.etree.ElementTree as ET
+            tree = ET.parse(JAVA_DEPS_FILE)
+            root = tree.getroot()
+            deps_elem = root.find('.//dependencies')
+            
+            if deps_elem is not None:
+                for dep in deps:
+                    group_id, artifact_id, version = dep.split(':')
+                    dep_elem = ET.SubElement(deps_elem, 'dependency')
+                    ET.SubElement(dep_elem, 'groupId').text = group_id
+                    ET.SubElement(dep_elem, 'artifactId').text = artifact_id
+                    ET.SubElement(dep_elem, 'version').text = version
+                
+                tree.write(JAVA_DEPS_FILE)
+                subprocess.check_call(['mvn', 'install'])
+
+# Global dependency manager instance
+dep_manager = DependencyManager()
 
 
 # Unified event JSON schema for all runtimes
@@ -134,6 +245,66 @@ Includes async event queue processor and robust event delivery.
 import subprocess
 import sys
 
+def run_code(source_file: str, language: str) -> str | None:
+    """
+    Run code in any supported language (C++, Python, Java) with automatic dependency management
+    
+    Args:
+        source_file: Path to the source file
+        language: 'cpp', 'python', or 'java'
+        
+    Returns:
+        stdout output from running the code
+    """
+    # Read source code
+    with open(source_file, 'r') as f:
+        code = f.read()
+    
+    # Detect and install dependencies
+    if language == 'python':
+        deps = dep_manager.detect_python_imports(code)
+        if deps - dep_manager.python_deps:  # Only install new deps
+            print(f"Installing Python dependencies: {deps - dep_manager.python_deps}")
+            dep_manager.install_python_deps(deps - dep_manager.python_deps)
+            dep_manager.python_deps.update(deps)
+        
+        result = subprocess.run([sys.executable, source_file], capture_output=True, text=True)
+        return result.stdout
+        
+    elif language == 'cpp':
+        deps = dep_manager.detect_cpp_includes(code)
+        if deps - dep_manager.cpp_deps:  # Only install new deps
+            print(f"Installing C++ dependencies: {deps - dep_manager.cpp_deps}")
+            dep_manager.install_cpp_deps(deps - dep_manager.cpp_deps)
+            dep_manager.cpp_deps.update(deps)
+            
+        result = subprocess.run(["g++", source_file, "-o", "cpp_out"])
+        if result.returncode != 0:
+            print("C++ compilation failed.")
+            return None
+        result = subprocess.run(["./cpp_out"], capture_output=True, text=True)
+        return result.stdout
+        
+    elif language == 'java':
+        deps = dep_manager.detect_java_imports(code)
+        if deps - dep_manager.java_deps:  # Only install new deps
+            print(f"Installing Java dependencies: {deps - dep_manager.java_deps}")
+            dep_manager.install_java_deps(deps - dep_manager.java_deps)
+            dep_manager.java_deps.update(deps)
+            
+        result = subprocess.run(["javac", source_file])
+        if result.returncode != 0:
+            print("Java compilation failed.")
+            return None
+        class_name = os.path.splitext(os.path.basename(source_file))[0]
+        result = subprocess.run(["java", class_name], capture_output=True, text=True)
+        return result.stdout
+        
+    else:
+        raise ValueError(f"Unsupported language: {language}")
+
+# Legacy run functions now consolidated into run_code above
+"""
 def run_cpp(source_file):
     result = subprocess.run(["g++", source_file, "-o", "cpp_out"])
     if result.returncode != 0:
@@ -154,6 +325,7 @@ def run_java(source_file):
     class_name = os.path.splitext(os.path.basename(source_file))[0]
     result = subprocess.run(["java", class_name], capture_output=True, text=True)
     return result.stdout
+"""
 
 def exchange_data(data, filename):
     with open(filename, 'w') as f:

@@ -2,3 +2,4 @@ astroid
 antlr4-python3-runtime
 pygls>=1.0.0
 pyzmq>=25.1.0
+numpy>=1.24.0

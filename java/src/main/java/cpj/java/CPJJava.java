@@ -1,34 +1,35 @@
+// CPJ Java Module
+// Handles Java code parsing, GUI integration, compilation, and execution
+
 package cpj.java;
 
-import java.io.File;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 
 public class CPJJava {
-    public static void runCompiledFile(String sourceFile) {
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Usage: java CPJJava <source_file.java>");
+            return;
+        }
+        String sourceFile = args[0];
+        String className = sourceFile.replace(".java", "");
         try {
-            String className = new File(sourceFile).getName().replace(".java", "");
-
-            // Ensure the bin directory exists
-            new File("bin").mkdirs();
-
-            // Compile the generated Java file
             if (!CPJJavaUtils.compileJava(sourceFile)) {
-                System.err.println("Failed to compile Java file: " + sourceFile);
-                return;
+                throw new Exception("Compilation failed.");
             }
-
-            // Run the compiled class
+            System.out.println("Compilation successful. Running program...");
             if (!CPJJavaUtils.runJava(className)) {
-                System.err.println("Failed to run Java class: " + className);
-                return;
+                throw new Exception("Execution failed.");
             }
-
-            // Show GUI window if this is a GUI application
-            if (className.startsWith("Generated") || className.endsWith("GUI")) {
-                CPJJavaGUI.showMainWindow();
-            }
+            // Advanced GUI
+            CPJJavaGUI.showMainWindow();
         } catch (Exception e) {
-            System.err.println("Error running Java file: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
+        // Integration with other languages can be added here (e.g., via sockets, files,
+        // or JNI)
     }
 }

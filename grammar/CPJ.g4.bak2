@@ -1,0 +1,177 @@
+grammar CPJ;
+
+// Parser Rules
+
+program
+    : (statement | NEWLINE)* EOF
+    ;
+
+statement
+    : guiBlock
+    | funcDef 
+    | typeDef
+    | eventHandler
+    | exprStmt SEMICOLON?
+    | cppStyleBlock
+    | guiElement
+    ;
+
+typeDef
+    : TYPE_KW Identifier LBRACE NEWLINE* (typeField COMMA?)* RBRACE NEWLINE*
+    ;
+
+typeFieldList
+    : typeField (COMMA typeField)* (COMMA)?
+    ;
+
+typeField
+    : Identifier COLON typeRef NEWLINE*
+    ;
+
+typeRef
+    : Identifier
+    | Identifier LBRACKET typeRef RBRACKET
+    | VOID
+    ;
+
+funcDef
+    : (PUBLIC? STATIC?)? DEF Identifier LPAREN paramList? RPAREN 
+      (ARROW typeRef)? (COLON (NEWLINE suite | suite) | cppStyleBlock)
+    ;
+
+paramList
+    : param (COMMA param)*
+    ;
+
+param
+    : Identifier (COLON typeRef)?
+    ;
+
+suite
+    : INDENT NEWLINE* statement+ DEDENT
+    | simpleStmt
+    ;
+
+simpleStmt
+    : exprStmt
+    ;
+    | simpleStmt
+    ;
+
+simpleStmt
+    : exprStmt
+    ;
+
+cppStyleBlock
+    : LBRACE NEWLINE* (statement SEMICOLON? NEWLINE?)* RBRACE NEWLINE?
+    ;
+
+exprStmt
+    : expression NEWLINE?
+    ;
+
+expression
+    : literal
+    | Identifier
+    | arrayExpr
+    | NEW typeRef LPAREN exprList? RPAREN
+    | expression LBRACKET expression RBRACKET
+    | expression DOT Identifier
+    | expression LPAREN exprList? RPAREN
+    | expression op=(MUL | DIV) expression
+    | expression op=(PLUS | MINUS) expression
+    | expression ASSIGN expression
+    | expression op=(EQ | NEQ) expression
+    | expression op=(LT | GT | LE | GE) expression
+    | LPAREN expression RPAREN
+    ;
+
+arrayExpr
+    : LBRACKET (expression (COMMA expression)*)? RBRACKET
+    ;
+
+exprList
+    : expression (COMMA expression)*
+    ;
+
+eventHandler
+    : ON eventName=Identifier (FROM source=Identifier)? DO COLON NEWLINE suite
+    ;
+
+guiBlock
+    : GUI COLON NEWLINE suite
+    ;
+
+literal
+    : IntegerLiteral
+    | FloatLiteral
+    | StringLiteral
+    | BooleanLiteral
+    ;
+
+// Lexer Rules
+
+GUI         : 'gui';
+ON          : 'on';
+DO          : 'do';
+FROM        : 'from';
+NEW         : 'new';
+DEF         : 'def' | 'func';
+PUBLIC      : 'public';
+STATIC      : 'static';
+TYPE_KW     : 'type';
+VOID        : 'void';
+
+ARROW       : '->';
+COLON       : ':';
+COMMA       : ',';
+DOT         : '.';
+SEMICOLON   : ';';
+
+ASSIGN      : '=';
+EQ          : '==';
+NEQ         : '!=';
+LT          : '<';
+GT          : '>';
+LE          : '<=';
+GE          : '>=';
+PLUS        : '+';
+MINUS       : '-';
+MUL         : '*';
+DIV         : '/';
+
+LPAREN      : '(';
+RPAREN      : ')';
+LBRACE      : '{';
+RBRACE      : '}';
+LBRACKET    : '[';
+RBRACKET    : ']';
+
+IntegerLiteral
+    : [0-9]+
+    ;
+
+FloatLiteral
+    : [0-9]+ '.' [0-9]*
+    | '.' [0-9]+
+    ;
+
+StringLiteral
+    : '"' ~["\r\n]* '"'
+    | '\'' ~['\r\n]* '\''
+    ;
+
+BooleanLiteral
+    : 'true'
+    | 'false'
+    ;
+
+Identifier
+    : [a-zA-Z_][a-zA-Z0-9_]*
+    ;
+
+// Handle whitespace and indentation
+INDENT : 'INDENT' ; // Python-style indentation token
+DEDENT : 'DEDENT' ; // Python-style dedentation token
+NEWLINE : [\r\n]+ ;
+WS : [ \t]+ -> skip ;

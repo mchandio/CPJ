@@ -1,27 +1,33 @@
-apply plugin: 'java'
-apply plugin: 'application'
-
-repositories {
-    mavenCentral()
+plugins {
+    id 'java'
+    id 'application'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+// Common configuration for all projects
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Shared configuration for Java projects
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
 
 dependencies {
-    implementation 'org.zeromq:jeromq:0.6.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+    implementation project(':java')
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src', 'java', 'stdlib']
-        }
-    }
-    test {
-        java {
-            srcDirs = ['test', 'test/framework']
-        }
-    }
+test {
+    useJUnitPlatform()
 }

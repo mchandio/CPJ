@@ -1,44 +1,257 @@
-// ANTLR4 grammar for a CPJ subset (initial draft)
-// Captures GUI block, widget statements, types maps (token and dict-style), and expressions
-// This grammar is intended as a starting point for migrating or generating a parser.
-
 grammar CPJ;
 
-// Parser rules
-program
-    : (statement | NEWLINE)* EOF
+tokens { INDENT, DEDENT }
+
+// Common operators
+MUL: '*';
+DIV: '/';
+FDIV: '//';
+MOD: '%';
+ADD: '+';
+SUB: '-';
+LSH: '<<';
+RSH: '>>';
+URSH: '>>>';
+LT: '<';
+GT: '>';
+LE: '<=';
+GE: '>=';
+EQ: '==';
+NE: '!=';
+BAND: '&';
+BXOR: '^';
+BOR: '|';
+AND: '&&';
+OR: '||';
+NOT: '!';
+BNOT: '~';
+ASSIGN: '=';
+MUL_ASSIGN: '*=';
+DIV_ASSIGN: '/=';
+MOD_ASSIGN: '%=';
+ADD_ASSIGN: '+=';
+SUB_ASSIGN: '-=';
+LSH_ASSIGN: '<<=';
+RSH_ASSIGN: '>>=';
+URSH_ASSIGN: '>>>=';
+BAND_ASSIGN: '&=';
+BXOR_ASSIGN: '^=';
+BOR_ASSIGN: '|=';
+INC: '++';
+DEC: '--';
+ARROW: '->';
+SCOPE: '::';
+ELVIS: '?:';
+DOT: '.';
+LAMBDA: '=>';
+POW: '**';
+POW_ASSIGN: '**=';
+AT: '@';
+
+// Keywords
+ABSTRACT: 'abstract';
+AS: 'as';
+ASSERT: 'assert';
+ASYNC: 'async';
+AWAIT: 'await';
+BREAK: 'break';
+CASE: 'case';
+CATCH: 'catch';
+CLASS: 'class';
+CONST: 'const';
+CONTINUE: 'continue';
+DEF: 'def';
+DEFAULT: 'default';
+DEL: 'del';
+DO: 'do';
+ELIF: 'elif';
+ELSE: 'else';
+ENUM: 'enum';
+EXTENDS: 'extends';
+FALSE: 'false';
+FINAL: 'final';
+FINALLY: 'finally';
+FOR: 'for';
+FROM: 'from';
+GLOBAL: 'global';
+IF: 'if';
+IMPLEMENTS: 'implements';
+IMPORT: 'import';
+IN: 'in';
+INSTANCEOF: 'instanceof';
+INTERFACE: 'interface';
+IS: 'is';
+NEW: 'new';
+NONE: 'None';
+NONLOCAL: 'nonlocal';
+NULL: 'null';
+PASS: 'pass';
+PRIVATE: 'private';
+PROTECTED: 'protected';
+PUBLIC: 'public';
+RAISE: 'raise';
+RETURN: 'return';
+STATIC: 'static';
+SUPER: 'super';
+SWITCH: 'switch';
+SYNCHRONIZED: 'synchronized';
+THIS: 'this';
+THROW: 'throw';
+THROWS: 'throws';
+TRUE: 'true';
+TRY: 'try';
+VOID: 'void';
+WHILE: 'while';
+WITH: 'with';
+YIELD: 'yield';
+
+// Preprocessor directives
+PRAGMA: '#pragma';
+DEFINE: '#define';
+UNDEF: '#undef';
+IFDEF: '#ifdef';
+IFNDEF: '#ifndef';
+ENDIF: '#endif';
+
+// Python built-ins
+PRINT: 'print';
+LEN: 'len';
+RANGE: 'range';
+LIST: 'list';
+DICT: 'dict';
+SET: 'set';
+TUPLE: 'tuple';
+ZIP: 'zip';
+MAP: 'map';
+FILTER: 'filter';
+SORTED: 'sorted';
+
+// Parser Rules
+program 
+    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE* EOF
     ;
 
-statement
+statement 
     : guiBlock
     | funcDef
+    | classDef
+    | interfaceDef
+    | enumDef
     | typeDef
     | eventHandler
-    | exprStmt
+    | importStmt
+    | exportStmt
+    | returnStmt
+    | throwStmt
+    | tryStmt
+    | ifStmt
+    | forStmt
+    | whileStmt
+    | doWhileStmt
+    | switchStmt
+    | withStmt
+    | asyncStmt
+    | awaitExpr
+    | assertStmt
+    | breakStmt
+    | continueStmt
+    | passStmt
+    | raiseStmt
+    | yieldStmt
+    | globalStmt
+    | nonlocalStmt
+    | deleteStmt
+    | exprStmt SEMICOLON?
+    | block
     ;
 
-// Event handler definition
-eventHandler
-    : ON eventName=Identifier (FROM source=Identifier)? DO COLON NEWLINE suite
+// Expression rules with precedence
+expr
+    : primary                                               #PrimaryExpr
+    | expr DOT ID                                          #DotExpr
+    | expr LPAREN argList? RPAREN                          #CallExpr
+    | expr LBRACKET expr RBRACKET                          #IndexExpr
+    | AWAIT expr                                           #AwaitExpr
+    | NEW creator                                          #NewExpr
+    | LPAREN typeRef RPAREN expr                          #CastExpr
+    | expr op=(INC | DEC)                                 #PostfixExpr
+    | op=(ADD | SUB | INC | DEC | NOT | BNOT) expr       #UnaryExpr
+    | expr POW expr                                       #PowerExpr
+    | expr op=(MUL | DIV | FDIV | MOD) expr              #MultiplicativeExpr
+    | expr op=(ADD | SUB) expr                           #AdditiveExpr
+    | expr op=(LSH | RSH | URSH) expr                    #ShiftExpr
+    | expr op=(LT | GT | LE | GE | INSTANCEOF | IS) expr #RelationalExpr
+    | expr op=(EQ | NE) expr                             #EqualityExpr
+    | expr BAND expr                                      #BitAndExpr
+    | expr BXOR expr                                      #BitXorExpr
+    | expr BOR expr                                       #BitOrExpr
+    | expr AND expr                                       #LogicalAndExpr
+    | expr OR expr                                        #LogicalOrExpr
+    | <assoc=right> expr ELVIS expr                      #ElvisExpr
+    | <assoc=right> expr QUESTION expr COLON expr        #TernaryExpr
+    | <assoc=right> expr
+      op=(ASSIGN | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN 
+        | DIV_ASSIGN | MOD_ASSIGN | POW_ASSIGN | LSH_ASSIGN 
+        | RSH_ASSIGN | URSH_ASSIGN | BAND_ASSIGN 
+        | BXOR_ASSIGN | BOR_ASSIGN) expr                 #AssignmentExpr
+    | LAMBDA paramList? ARROW expr                       #LambdaExpr
     ;
 
-// User-defined type declaration
 typeDef
-    : TYPE_KW Identifier LBRACE typeFieldList RBRACE NEWLINE*
-    ;
-
-typeFieldList
-    : typeField (COMMA typeField)* (COMMA)?
+    : TYPE_KW ID LBRACE (typeField (COMMA typeField)*)? RBRACE
     ;
 
 typeField
-    : Identifier COLON Identifier
+    : ID COLON typeRef
     ;
 
+typeRef
+    : VOID                                                       #VoidType
+    | primitiveType                                             #PrimitiveType
+    | ID (DOT ID)*                                             #ClassType
+    | typeRef LBRACKET RBRACKET                                #ArrayType
+    | typeRef LT typeRef (COMMA typeRef)* GT                   #GenericType
+    | QUESTION (EXTENDS typeRef | SUPER typeRef)?              #WildcardType
+    | LPAREN typeRef (COMMA typeRef)* RPAREN ARROW typeRef    #FunctionType
+    ;
 
-// Function definition with optional type annotations and return type
+primitiveType
+    : BOOLEAN | BYTE | SHORT | INT | LONG | FLOAT | DOUBLE | CHAR
+    ;
+
+classDef
+    : (modifier)* CLASS ID 
+      (LT typeParameter (COMMA typeParameter)* GT)?
+      (EXTENDS typeRef)?
+      (IMPLEMENTS typeRef (COMMA typeRef)*)?
+      classBody
+    ;
+
+interfaceDef
+    : (modifier)* INTERFACE ID
+      (LT typeParameter (COMMA typeParameter)* GT)?
+      (EXTENDS typeRef (COMMA typeRef)*)?
+      interfaceBody
+    ;
+
+enumDef
+    : (modifier)* ENUM ID (IMPLEMENTS typeRef (COMMA typeRef)*)?
+      LBRACE enumConstants? (COMMA)? enumBodyDeclarations? RBRACE
+    ;
+
+modifier
+    : PUBLIC | PRIVATE | PROTECTED | STATIC | FINAL | ABSTRACT
+    | SYNCHRONIZED | NATIVE | STRICTFP | TRANSIENT | VOLATILE
+    | ASYNC | CONST
+    ;
+
+typeParameter
+    : ID (EXTENDS typeRef (BAND typeRef)*)?
+    ;
+
 funcDef
-    : DEF Identifier LPAREN paramList? RPAREN (ARROW Identifier)? COLON (NEWLINE suite | suite)
+    : (PUBLIC? STATIC?)? DEF ID LPAREN paramList? RPAREN 
+      (ARROW typeRef)? (COLON suite | block)
     ;
 
 paramList
@@ -46,261 +259,198 @@ paramList
     ;
 
 param
-    : Identifier (COLON Identifier)?
+    : ID (COLON typeRef)?
     ;
-// New lexer tokens for type system
-TYPE_KW: [tT][yY][pP][eE] ;
-ARROW: '->' ;
-ON: [oO][nN] ;
-FROM: [fF][rR][oO][mM] ;
-DO: [dD][oO] ;
 
 suite
-    : INDENT NEWLINE* statement+ DEDENT
-    | simpleStmt
+    : INDENT statement+ DEDENT
     ;
 
-simpleStmt
-    : exprStmt
+block
+    : LBRACE statement* RBRACE
+    ;
+
+importStmt
+    : IMPORT (DOT | MUL | ID)+ (AS ID)?
+    | FROM (DOT | ID)+ IMPORT (MUL | LPAREN importNames RPAREN | importNames)
+    ;
+
+importNames
+    : ID (AS ID)? (COMMA ID (AS ID)?)*
+    ;
+
+ifStmt
+    : IF test COLON suite (ELIF test COLON suite)* (ELSE COLON suite)?
+    | IF parExpr block (ELIF parExpr block)* (ELSE block)?
+    ;
+
+forStmt
+    : FOR LPAREN forControl RPAREN (block | COLON suite)
+    | asyncForStmt
+    ;
+
+asyncForStmt
+    : ASYNC FOR LPAREN forControl RPAREN (block | COLON suite)
+    ;
+
+forControl
+    : ID IN expr
+    | variableDecl IN expr
+    | forInit? SEMICOLON expr? SEMICOLON forUpdate?
+    ;
+
+whileStmt
+    : WHILE parExpr (block | COLON suite)
+    ;
+
+doWhileStmt
+    : DO block WHILE parExpr SEMICOLON
+    ;
+
+tryStmt
+    : TRY block 
+      (catchClause+ finallyBlock? | finallyBlock)
+    ;
+
+catchClause
+    : CATCH LPAREN variableModifier* catchType ID RPAREN block
+    ;
+
+catchType
+    : qualifiedName (BOR qualifiedName)*
+    ;
+
+finallyBlock
+    : FINALLY block
+    ;
+
+switchStmt
+    : SWITCH parExpr LBRACE switchBlock* RBRACE
+    ;
+
+switchBlock
+    : (CASE expr | DEFAULT) COLON statement*
+    ;
+
+withStmt
+    : WITH expr (AS ID)? COLON suite
+    ;
+
+assertStmt
+    : ASSERT expr (COMMA expr)?
+    ;
+
+yieldStmt
+    : YIELD (FROM)? expr
+    ;
+
+globalStmt
+    : GLOBAL ID (COMMA ID)*
+    ;
+
+nonlocalStmt
+    : NONLOCAL ID (COMMA ID)*
+    ;
+
+returnStmt
+    : RETURN expr?
+    ;
+
+throwStmt
+    : THROW expr
+    ;
+
+breakStmt
+    : BREAK ID?
+    ;
+
+continueStmt
+    : CONTINUE ID?
+    ;
+
+passStmt
+    : PASS
+    ;
+
+deleteStmt
+    : DEL expr (COMMA expr)*
+    ;
+
+raiseStmt
+    : RAISE (expr (FROM expr)?)?
+    ;
+    : LBRACE statement* RBRACE
     ;
 
 exprStmt
-    : expression NEWLINE
+    : expr
     ;
 
-// GUI block
-guiBlock
-    : GUI_KW Identifier COLON NEWLINE INDENT (guiBody | eventHandler)+ DEDENT
-    | GUI_CAP LBRACE NEWLINE* INDENT (guiBody | eventHandler)+ DEDENT RBRACE NEWLINE*
+expr
+    : primary
+    | expr op=(MUL | DIV) expr
+    | expr op=(PLUS | MINUS) expr
+    | expr ARROW ID
+    | expr ASSIGN expr
+    | expr LPAREN argList? RPAREN
     ;
 
-guiBody
-    : typesLine
-    | widgetStmt
-    | callStmt
-    | guiProp
-    | expression (NEWLINE)?
-    | NEWLINE+
-    ;
-
-guiProp
-    : Identifier COLON expression NEWLINE
-    ;
-
-// types support: token-style or dict-style
-typesLine
-    : TYPES_KW (typesTokens | typesDict)
-    ;
-
-// token-style: one or more key:type pairs on the same line
-typesTokens
-    : (Identifier COLON Identifier | Identifier '=' Identifier)+ NEWLINE
-    ;
-
-// dict-style: allow either inline {"x":"int",...} or block style with INDENT/DEDENT
-typesDict
-    : LBRACE (typeEntries RBRACE NEWLINE | NEWLINE INDENT NEWLINE* typeLine+ DEDENT RBRACE NEWLINE)
-    ;
-
-typeEntries
-    : typeEntry (',' typeEntry)* (',')?
-    ;
-
-typeLine
-    : typeEntry (',')? NEWLINE
-    ;
-
-// allow Identifier or StringLiteral for keys and for type names
-typeEntry
-    : (StringLiteral | Identifier) COLON (StringLiteral | Identifier)
-    ;
-
-// Widget statements (a subset)
-widgetStmt
-    : ADD_TEXT LPAREN args? RPAREN
-    | ADD_BTN LPAREN args? RPAREN
-    | ADD_CHECK LPAREN args? RPAREN
-    | ADD_SLIDER LPAREN args? RPAREN
-    ;
-
-args
-    : arg (',' arg)*
-    ;
-
-arg
-    : StringLiteral
-    | expression
-    ;
-
-// expression variant without requiring trailing NEWLINE — used inside GUI bodies
-exprNoNewline
-    : expression
-    ;
-
-// Expressions (basic, with dotted identifiers and function calls)
-expression
-    : lambdaExpr
-    ;
-lambdaExpr
-    : logicalOr
-    ;
-
-logicalOr
-    : logicalAnd ('or' logicalAnd)*
-    ;
-
-logicalAnd
-    : equality ('and' equality)*
-    ;
-
-equality
-    : comparison ((EQ | NEQ) comparison)*
-    ;
-
-comparison
-    : bitwiseOr ((LT | GT | LE | GE | IN | IS) bitwiseOr)*
-    ;
-
-bitwiseOr
-    : bitwiseXor (BITOR bitwiseXor)*
-    ;
-
-bitwiseXor
-    : bitwiseAnd (BITXOR bitwiseAnd)*
-    ;
-
-bitwiseAnd
-    : shift (BITAND shift)*
-    ;
-
-shift
-    : sum ((LSHIFT | RSHIFT) sum)*
-    ;
-
-sum
-    : term ((PLUS | MINUS) term)*
-    ;
-
-term
-    : factor ((STAR | DIV | MOD) factor)*
-    ;
-
-factor
-    : (PLUS | MINUS | TILDE) factor
-    | power
-    ;
-
-power
-    : atom (POW factor)?
-    ;
-
-atom
-    : LPAREN expression RPAREN
-    | literal
-    | dottedName ( LPAREN argList? RPAREN )?
+primary
+    : INT
+    | FLOAT
+    | STRING
+    | BOOL
+    | ID
+    | LPAREN expr RPAREN
     ;
 
 argList
-    : expression (',' expression)*
+    : expr (COMMA expr)*
     ;
 
-// Bare function-call statement (e.g. show()) used inside GUI bodies
-callStmt
-    : dottedName '(' argList? ')' (NEWLINE | INDENT | DEDENT)?
+guiBlock
+    : GUI COLON suite
     ;
 
-
-dottedName
-    : Identifier (DOT Identifier)*
+eventHandler
+    : ON ID (FROM ID)? DO COLON suite
     ;
 
-literal
-    : Integer
-    | Float
-    | StringLiteral
-    | TRUE | FALSE | NULL
-    ;
+// Lexer Rules
+GUI : 'gui';
+ON : 'on';
+DO : 'do';
+FROM : 'from';
+DEF : 'def';
+PUBLIC : 'public';
+STATIC : 'static';
+TYPE_KW : 'type';
+VOID : 'void';
 
-// Lexer rules
+ARROW : '->';
+COLON : ':';
+COMMA : ',';
+SEMICOLON : ';';
+ASSIGN : '=';
+PLUS : '+';
+MINUS : '-';
+MUL : '*';
+DIV : '/';
 
-// Structural tokens
-NEWLINE: ('\r'? '\n')+ ;
-INDENT: '<INDENT>' ;
-DEDENT: '<DEDENT>' ;
+LPAREN : '(';
+RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
+LBRACKET : '[';
+RBRACKET : ']';
 
-// Punctuation and operators (named tokens to avoid ambiguous implicit numbering)
-LPAREN: '(' ;
-RPAREN: ')' ;
-COLON: ':' ;
-COMMA: ',' ;
-LBRACE: '{' ;
-RBRACE: '}' ;
-DOT: '.' ;
+INT : [0-9]+;
+FLOAT : [0-9]+ '.' [0-9]*;
+STRING : '"' ~["\r\n]* '"' | '\'' ~['\r\n]* '\'';
+BOOL : 'true' | 'false';
+ID : [a-zA-Z_][a-zA-Z0-9_]*;
 
-PLUS: '+' ;
-MINUS: '-' ;
-STAR: '*' ;
-DIV: '/' ;
-MOD: '%' ;
-POW: '**' ;
-TILDE: '~' ;
-
-LT: '<' ;
-GT: '>' ;
-LE: '<=' ;
-GE: '>=' ;
-EQ: '==' ;
-NEQ: '!=' ;
-LSHIFT: '<<' ;
-RSHIFT: '>>' ;
-BITOR: '|' ;
-BITXOR: '^' ;
-BITAND: '&' ;
-
-// Keywords and widget names
-// Keywords (case-insensitive where appropriate). Widget function names are case-sensitive.
-DEF: [dD][eE][fF] ;
-GUI_CAP: 'GUI' ;
-GUI_KW: [gG][uU][iI] ;
-TYPES_KW: [tT][yY][pP][eE][sS] ;
-ADD_TEXT: 'addTextField' ;
-ADD_BTN: 'addButton' ;
-ADD_CHECK: 'addCheckBox' ;
-ADD_SLIDER: 'addSlider' ;
-OR: [oO][rR] ;
-AND: [aA][nN][dD] ;
-IN: [iI][nN] ;
-IS: [iI][sS] ;
-TRUE: [tT][rR][uU][eE] ;
-FALSE: [fF][aA][lL][sS][eE] ;
-NULL: [nN][uU][lL][lL] ;
-
-// Numeric literals: Float must come before Integer so multi-part numbers are matched first.
-fragment DIGIT: [0-9] ;
-fragment DIGITS: DIGIT+ ;
-
-Float
-    : DIGITS '.' DIGITS? ([eE] [+-]? DIGITS)?
-    | '.' DIGITS ([eE] [+-]? DIGITS)?
-    | DIGITS [eE] [+-]? DIGITS
-    ;
-
-Integer: DIGITS ;
-StringLiteral
-    : '"' (~["\\] | '\\' .)* '"'
-    | '\'' (~['\\] | '\\' .)* '\''
-    ;
-
-Identifier
-    : [a-zA-Z_][a-zA-Z0-9_]*
-    ;
-
-COMMENT
-    : '#' ~[\r\n]* -> skip
-    ;
-
-WS: [ \t]+ -> channel(HIDDEN) ;
-
-// Note: Real indentation-sensitive grammar requires custom handling or the Python-style
-// INDENT/DEDENT preprocessing used by the ANTLR Python grammar. Here we use placeholders
-// to indicate block structure; a later pass should replace them with real handling.
+INDENT : 'INDENT';
+DEDENT : 'DEDENT';
+NEWLINE : [\r\n]+;
+WS : [ \t]+ -> skip;
