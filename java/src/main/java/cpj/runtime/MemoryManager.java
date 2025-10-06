@@ -74,7 +74,7 @@ public class MemoryManager {
     }
 
     private static class TrackedObject {
-        final Object object;
+        final Object object; // Holds strong reference to prevent GC while tracked
         final String sourceLanguage;
         final AtomicInteger refCount;
 

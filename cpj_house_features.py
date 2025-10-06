@@ -1,17 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union, Set, cast, Literal, TypeAlias
 from cpj_type_system import WallSection, TypeSystem, TypeKind
-from cpj_parser2 import Node, NodeType as NodeType2
-from cpj_enums import NodeType
+from cpj_parser2 import Node, NodeType
 from enum import Enum, auto
 from cpj_house_decorations import (
-    Decoration, DecorationTarget as DecorTarget, DecorationEventType,
+    Decoration, DecorationTarget, DecorationEventType,
     DecorationEvent, ThemeManager
 )
 from collections.abc import Iterable
-
-# Create our own wrapped types to handle type compatibility
-DecorationTarget: TypeAlias = DecorTarget
 
 FeatureTarget = Literal['WINDOW', 'DOOR', 'LIGHT']
 
@@ -21,9 +17,9 @@ def _target(s: str) -> str:
     # Strings work in apply_theme since it handles them internally
     return s
 
-def _cast_node_type(s: str) -> NodeType2:
+def _cast_node_type(s: str) -> NodeType:
     """Convert string to parser NodeType"""
-    return cast(NodeType2, NodeType[s])
+    return cast(NodeType, NodeType[s])
 
 class AccessLevel(Enum):
     PUBLIC = auto()
@@ -41,7 +37,7 @@ class Window(Node):
     def apply_decorations(self, theme_manager: ThemeManager) -> None:
         """Apply decorations from theme manager"""
         self._theme_manager = theme_manager
-        decorations = theme_manager.apply_theme('WINDOW')  # Use string directly, handled by ThemeManager
+        decorations = theme_manager.apply_theme(DecorationTarget.WINDOW)
         self.decorations.clear()
         for d in decorations:
             self.decorations.add(cast(Decoration, d))
@@ -49,7 +45,7 @@ class Window(Node):
     def _on_theme_changed(self, event: DecorationEvent) -> None:
         """Handle theme change events"""
         if self._theme_manager:
-            decorations = self._theme_manager.apply_theme('WINDOW')
+            decorations = self._theme_manager.apply_theme(DecorationTarget.WINDOW)
             self.decorations.clear()
             for d in decorations:
                 self.decorations.add(cast(Decoration, d))
@@ -77,7 +73,7 @@ class Door(Node):
     def apply_decorations(self, theme_manager: ThemeManager) -> None:
         """Apply decorations from theme manager"""
         self._theme_manager = theme_manager
-        decorations = theme_manager.apply_theme('DOOR')
+        decorations = theme_manager.apply_theme(DecorationTarget.DOOR)
         self.decorations.clear()
         for d in decorations:
             self.decorations.add(cast(Decoration, d))
@@ -85,7 +81,7 @@ class Door(Node):
     def _on_theme_changed(self, event: DecorationEvent) -> None:
         """Handle theme change events"""
         if self._theme_manager:
-            decorations = self._theme_manager.apply_theme('DOOR')
+            decorations = self._theme_manager.apply_theme(DecorationTarget.DOOR)
             self.decorations.clear()
             for d in decorations:
                 self.decorations.add(cast(Decoration, d))
@@ -113,7 +109,7 @@ class Light(Node):
     def apply_decorations(self, theme_manager: ThemeManager) -> None:
         """Apply decorations from theme manager"""
         self._theme_manager = theme_manager
-        decorations = theme_manager.apply_theme('LIGHT')
+        decorations = theme_manager.apply_theme(DecorationTarget.LIGHT)
         self.decorations.clear()
         for d in decorations:
             self.decorations.add(cast(Decoration, d))
@@ -121,7 +117,7 @@ class Light(Node):
     def _on_theme_changed(self, event: DecorationEvent) -> None:
         """Handle theme change events"""
         if self._theme_manager:
-            decorations = self._theme_manager.apply_theme('LIGHT')
+            decorations = self._theme_manager.apply_theme(DecorationTarget.LIGHT)
             self.decorations.clear()
             for d in decorations:
                 self.decorations.add(cast(Decoration, d))

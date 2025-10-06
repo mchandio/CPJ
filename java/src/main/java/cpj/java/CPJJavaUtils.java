@@ -4,7 +4,6 @@
 package cpj.java;
 
 import java.io.*;
-import java.util.HashMap;
 
 public class CPJJavaUtils {
     public static boolean compileJava(String sourceFile) {

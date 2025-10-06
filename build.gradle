@@ -24,6 +24,12 @@ subprojects {
     }
 }
 
+project(':java') {
+    dependencies {
+        // Add java module dependencies here
+    }
+}
+
 dependencies {
     implementation project(':java')
 }

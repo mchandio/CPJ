@@ -1,7 +1,5 @@
 package cpj.test;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +10,6 @@ public class ProgrammaticGuiTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        final AtomicReference<GeneratedCalculator> ref = new AtomicReference<>();
-
         // Create the GUI on the EDT and store reference
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             calculator = new GeneratedCalculator();

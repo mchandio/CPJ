@@ -1,0 +1,62 @@
+@dataclass
+class Foundation(Node):
+    """Core language functionality and configuration"""
+    memory_config: Dict[str, Any] = field(default_factory=dict)
+    type_system: TypeSystem = field(default_factory=TypeSystem)
+    utilities: List['Utility'] = field(default_factory=list)
+
+    def __init__(self, **kwargs):
+        super().__init__(node_type=NodeType.FOUNDATION, **kwargs)
+        self.memory_config = kwargs.get('memory_config', {})
+        self.type_system = kwargs.get('type_system', TypeSystem())
+        self.utilities = kwargs.get('utilities', [])
+
+@dataclass
+class Room(Node):
+    """A function/module implementation"""
+    purpose: str = field(default="")  # Function's role
+    entrances: List[Variable] = field(default_factory=list)  # Parameters 
+    exits: WallSection = field(default_factory=lambda: WallSection(TypeKind.UNDEFINED, 'void'))  # Return type
+    contents: Optional['Block'] = field(default=None)  # Function body
+    is_async: bool = field(default=False)
+    access_level: AccessLevel = field(default=AccessLevel.PUBLIC)
+
+    def __init__(self, **kwargs):
+        super().__init__(node_type=NodeType.ROOM, **kwargs)
+        self.purpose = kwargs.get('purpose', "")
+        self.entrances = kwargs.get('entrances', [])
+        self.exits = kwargs.get('exits', WallSection(TypeKind.UNDEFINED, 'void'))
+        self.contents = kwargs.get('contents', None)
+        self.is_async = kwargs.get('is_async', False)
+        self.access_level = kwargs.get('access_level', AccessLevel.PUBLIC)
+
+@dataclass
+class Blueprint(Node):
+    """A type definition"""
+    sections: List[Variable] = field(default_factory=list)  # Fields
+    access_level: AccessLevel = field(default=AccessLevel.PUBLIC)
+    
+    def __init__(self, **kwargs):
+        super().__init__(node_type=NodeType.BLUEPRINT, **kwargs)
+        self.sections = kwargs.get('sections', [])
+        self.access_level = kwargs.get('access_level', AccessLevel.PUBLIC)
+
+@dataclass
+class Utility(Node):
+    """Built-in functionality"""
+    interface: Dict[str, WallSection] = field(default_factory=dict)
+    access_level: AccessLevel = field(default=AccessLevel.PUBLIC)
+    
+    def __init__(self, **kwargs):
+        super().__init__(node_type=NodeType.UTILITY, **kwargs)
+        self.interface = kwargs.get('interface', {})
+        self.access_level = kwargs.get('access_level', AccessLevel.PUBLIC)
+
+@dataclass
+class Block(Node):
+    """A sequence of statements"""
+    statements: List[Node] = field(default_factory=list)
+    
+    def __init__(self, **kwargs):
+        super().__init__(node_type=NodeType.BLOCK, **kwargs)
+        self.statements = kwargs.get('statements', [])

@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, TypeVar, Generic
 from enum import Enum, auto
 from cpj_type_system import TypeSystem, TypeKind, WallSection
-from cpj_parser2 import Node, NodeType
+from cpj_parser2 import Node
+from cpj_enums import NodeType
 from cpj_enums import AccessLevel
 
 T = TypeVar('T')

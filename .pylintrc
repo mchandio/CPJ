@@ -1,0 +1,23 @@
+[MASTER]
+extension-pkg-whitelist=numpy,torch
+ignore=CVS
+ignore-patterns=
+persistent=yes
+load-plugins=
+jobs=0
+
+[MESSAGES CONTROL]
+disable=C0111,C0103,C0303,W0311,W0603,W0702,R0903,R0913,R0914
+
+[REPORTS]
+output-format=text
+reports=no
+score=yes
+
+[FORMAT]
+max-line-length=100
+ignore-long-lines=^\s*(# )?<?https?://\S+>?$
+single-line-if-stmt=no
+no-space-check=trailing-comma,dict-separator
+max-module-lines=2000
+indent-string='    '

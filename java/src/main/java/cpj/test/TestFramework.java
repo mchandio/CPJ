@@ -2,7 +2,6 @@ package cpj.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class TestFramework {
     public static class TestCase {
@@ -112,6 +111,11 @@ public class TestFramework {
 
         public Benchmark(String name) {
             this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Benchmark '%s': %d ms", name, endTime - startTime);
         }
 
         public void start() {

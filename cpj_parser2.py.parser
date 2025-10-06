@@ -1,0 +1,41 @@
+class Parser:
+    """CPJ Parser - Converts token stream into AST"""
+    
+    def __init__(self, tokens: List[TokenInfo]):
+        self.tokens = tokens
+        self.current = 0
+        self.errors = []
+    
+    def parse(self) -> House:
+        """Parse the token stream into a house AST"""
+        try:
+            rooms = []
+            blueprints = []
+            utilities = []
+            foundation = None
+            
+            while not self.is_at_end():
+                area = self.parse_declaration()
+                if area:
+                    if isinstance(area, Room):
+                        rooms.append(area)
+                    elif isinstance(area, Blueprint):
+                        blueprints.append(area)
+                    elif isinstance(area, Utility):
+                        utilities.append(area)
+                    elif isinstance(area, Foundation):
+                        if foundation:
+                            self.error("Only one foundation allowed per house")
+                        foundation = area
+            
+            # Create the house node
+            house = House(node_type=NodeType.HOUSE, location=(1, 1), name="main")
+            house.foundation = foundation or Foundation(node_type=NodeType.FOUNDATION, location=(1,1))
+            house.rooms = rooms
+            house.blueprints = blueprints
+            house.utilities = utilities
+            return house
+            
+        except ParseError as e:
+            self.errors.append(e)
+            return None

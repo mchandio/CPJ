@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Set, Callable, TypeVar, Generic, Union, Tuple
 from cpj_type_system import TypeSystem, TypeKind, WallSection
-from cpj_parser2 import Node, NodeType
-from cpj_enums import AccessLevel
+from cpj_parser2 import Node
+from cpj_enums import AccessLevel, NodeType
 import numpy as np
 from abc import ABC, abstractmethod
 
@@ -85,16 +85,16 @@ class Layer:
 @dataclass
 class NeuralNetwork(Node):
     """Neural network implementation"""
-    name: str = field(default="")
     kind: AIKind = field(default=AIKind.NEURAL)
     config: AIConfig = field(default_factory=AIConfig)
     _layers: List[Layer] = field(default_factory=list)
     _type_system: Optional[TypeSystem] = field(default=None, init=False)
     
     def __init__(self, type_system: TypeSystem, **kwargs):
-        super().__init__(node_type=NodeType.AI, **kwargs)
+        location = kwargs.pop('location', (0, 0))
+        name = kwargs.pop('name', 'neural_network')
+        super().__init__(node_type=NodeType.AI, location=location, name=name)
         self._type_system = type_system
-        self.name = kwargs.get('name', '')
         self.config = kwargs.get('config', AIConfig())
         
     def add_layer(self, input_size: int, output_size: int, activation: str = "relu"):
@@ -198,7 +198,8 @@ class Memory:
         
     def sample(self, batch_size: int) -> List[Experience]:
         """Sample experiences from memory"""
-        return np.random.choice(self._buffer, batch_size).tolist()
+        import random
+        return random.sample(self._buffer, min(batch_size, len(self._buffer)))
         
     def clear(self):
         """Clear all memories"""
@@ -227,6 +228,8 @@ class Agent(Node):
         
     def act(self, state: np.ndarray) -> np.ndarray:
         """Choose an action based on current state"""
+        if self._neural_net is None or not self._neural_net._layers:
+            raise ValueError("Neural network is not set or has no layers.")
         if np.random.random() < self.config.exploration_rate:
             return np.random.randn(self._neural_net._layers[-1].biases.shape[1])
         return self._neural_net.forward(state)

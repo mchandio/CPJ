@@ -51,7 +51,6 @@ public class TypeMarshaller {
      */
     public static <T> T unmarshal(String json, Class<T> targetClass) throws Exception {
         JsonNode root = mapper.readTree(json);
-        String type = root.get("type").asText();
         JsonNode data = root.get("data");
         return mapper.treeToValue(data, targetClass);
     }

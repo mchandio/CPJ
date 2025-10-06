@@ -3,13 +3,11 @@ package cpj.ipc;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class MessageQueue implements AutoCloseable {
     public enum Mode {
@@ -131,6 +129,7 @@ public class MessageQueue implements AutoCloseable {
     public void close() {
         running.set(false);
         if (receiveThread != null) {
+            System.out.println("Closing message queue at address: " + address);
             receiveThread.interrupt();
             try {
                 receiveThread.join(1000);

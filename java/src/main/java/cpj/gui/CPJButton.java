@@ -3,7 +3,6 @@ package cpj.gui;
 import cpj.ipc.Event;
 import cpj.ipc.EventBus;
 import javax.swing.*;
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 

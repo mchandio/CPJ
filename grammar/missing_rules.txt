@@ -1,0 +1,112 @@
+// Missing rules to add to CPJ.g4
+
+exportStmt
+    : EXPORT (DEFAULT | STAR | LBRACE exportList RBRACE) (FROM qualifiedName)?
+    ;
+
+exportList
+    : ID (AS ID)? (COMMA ID (AS ID)?)*
+    ;
+
+parExpr
+    : LPAREN expr RPAREN
+    ;
+
+variableDecl
+    : (FINAL | CONST)? typeRef ID (ASSIGN expr)?
+    ;
+
+classBody
+    : LBRACE classMember* RBRACE
+    ;
+
+classMember
+    : (modifier)* (fieldDecl | methodDecl | constructorDecl | classDef)
+    ;
+
+interfaceBody
+    : LBRACE interfaceMember* RBRACE
+    ;
+
+interfaceMember
+    : (modifier)* (abstractMethodDecl | defaultMethodDecl | interfaceDef)
+    ;
+
+abstractMethodDecl
+    : typeRef ID LPAREN paramList? RPAREN SEMICOLON
+    ;
+
+defaultMethodDecl
+    : DEFAULT typeRef ID LPAREN paramList? RPAREN block
+    ;
+
+constructorDecl
+    : (modifier)* ID LPAREN paramList? RPAREN block
+    ;
+
+methodDecl
+    : typeRef ID LPAREN paramList? RPAREN (THROWS typeRef (COMMA typeRef)*)? block
+    ;
+
+fieldDecl
+    : typeRef ID (ASSIGN expr)? SEMICOLON
+    ;
+
+enumConstants
+    : enumConstant (COMMA enumConstant)*
+    ;
+
+enumConstant
+    : ID (LPAREN argList? RPAREN)? (classBody)?
+    ;
+
+enumBodyDeclarations
+    : SEMICOLON classMember*
+    ;
+
+forInit
+    : variableDecl
+    | expr (COMMA expr)*
+    ;
+
+forUpdate
+    : expr (COMMA expr)*
+    ;
+
+creator
+    : nonArrayCreator
+    | arrayCreator
+    ;
+
+nonArrayCreator
+    : typeRef LPAREN argList? RPAREN
+    ;
+
+arrayCreator
+    : typeRef LBRACKET (expr | RBRACKET (LBRACKET expr? RBRACKET)*) RBRACKET
+    ;
+
+functionLiteral
+    : FUNCTION? LPAREN paramList? RPAREN (COLON typeRef)? block
+    ;
+
+arrayLiteral
+    : LBRACKET (expr (COMMA expr)* COMMA?)? RBRACKET
+    ;
+
+dictionaryLiteral
+    : LBRACE (keyValue (COMMA keyValue)* COMMA?)? RBRACE
+    ;
+
+keyValue
+    : expr COLON expr
+    ;
+
+qualifiedName
+    : ID (DOT ID)*
+    ;
+
+variableModifier
+    : FINAL
+    | CONST
+    ;

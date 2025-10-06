@@ -1,7 +1,5 @@
 grammar CPJ;
 
-tokens { INDENT, DEDENT }
-
 // Common operators
 MUL: '*';
 DIV: '/';
@@ -113,6 +111,27 @@ IFDEF: '#ifdef';
 IFNDEF: '#ifndef';
 ENDIF: '#endif';
 
+// Additional type keywords
+BOOLEAN: 'boolean';
+BYTE: 'byte';
+SHORT: 'short';
+LONG: 'long';
+DOUBLE: 'double';
+CHAR: 'char';
+
+// Other tokens
+QUESTION: '?';
+NATIVE: 'native';
+STRICTFP: 'strictfp';
+TRANSIENT: 'transient';
+VOLATILE: 'volatile';
+NUMBER: INT | FLOAT;
+STRING_LITERAL: STRING;
+ON: 'on';
+EXPORT: 'export';
+STAR: '*';
+FUNCTION: 'function';
+
 // Python built-ins
 PRINT: 'print';
 LEN: 'len';
@@ -151,7 +170,6 @@ statement
     | switchStmt
     | withStmt
     | asyncStmt
-    | awaitExpr
     | assertStmt
     | breakStmt
     | continueStmt
@@ -207,7 +225,7 @@ typeField
 
 typeRef
     : VOID                                                       #VoidType
-    | primitiveType                                             #PrimitiveType
+    | primitiveType                                             #PrimitiveTypeRef
     | ID (DOT ID)*                                             #ClassType
     | typeRef LBRACKET RBRACKET                                #ArrayType
     | typeRef LT typeRef (COMMA typeRef)* GT                   #GenericType
@@ -224,19 +242,19 @@ classDef
       (LT typeParameter (COMMA typeParameter)* GT)?
       (EXTENDS typeRef)?
       (IMPLEMENTS typeRef (COMMA typeRef)*)?
-      classBody
+      (COLON suite | classBody)
     ;
 
 interfaceDef
     : (modifier)* INTERFACE ID
       (LT typeParameter (COMMA typeParameter)* GT)?
       (EXTENDS typeRef (COMMA typeRef)*)?
-      interfaceBody
+      (COLON suite | interfaceBody)
     ;
 
 enumDef
     : (modifier)* ENUM ID (IMPLEMENTS typeRef (COMMA typeRef)*)?
-      LBRACE enumConstants? (COMMA)? enumBodyDeclarations? RBRACE
+      (COLON suite | LBRACE enumConstants? (COMMA)? enumBodyDeclarations? RBRACE)
     ;
 
 modifier
@@ -250,8 +268,10 @@ typeParameter
     ;
 
 funcDef
-    : (PUBLIC? STATIC?)? DEF ID LPAREN paramList? RPAREN 
+    : (modifier)* DEF ID LPAREN paramList? RPAREN
       (ARROW typeRef)? (COLON suite | block)
+    | (modifier)* typeRef ID LPAREN paramList? RPAREN
+      (COLON suite | block)
     ;
 
 paramList
@@ -260,14 +280,17 @@ paramList
 
 param
     : ID (COLON typeRef)?
+    | typeRef ID
     ;
 
 suite
     : INDENT statement+ DEDENT
+    | statement
     ;
 
 block
-    : LBRACE statement* RBRACE
+    : LBRACE NEWLINE* statement* RBRACE NEWLINE*
+    | COLON suite
     ;
 
 importStmt
@@ -280,17 +303,21 @@ importNames
     ;
 
 ifStmt
-    : IF test COLON suite (ELIF test COLON suite)* (ELSE COLON suite)?
-    | IF parExpr block (ELIF parExpr block)* (ELSE block)?
+    : IF test block (ELIF test block)* (ELSE block)?
+    ;
+
+test
+    : parExpr
+    | expr
     ;
 
 forStmt
-    : FOR LPAREN forControl RPAREN (block | COLON suite)
+    : FOR LPAREN forControl RPAREN block
     | asyncForStmt
     ;
 
 asyncForStmt
-    : ASYNC FOR LPAREN forControl RPAREN (block | COLON suite)
+    : ASYNC FOR LPAREN forControl RPAREN block
     ;
 
 forControl
@@ -300,11 +327,11 @@ forControl
     ;
 
 whileStmt
-    : WHILE parExpr (block | COLON suite)
+    : WHILE test block
     ;
 
 doWhileStmt
-    : DO block WHILE parExpr SEMICOLON
+    : DO block WHILE parExpr SEMICOLON?
     ;
 
 tryStmt
@@ -329,15 +356,15 @@ switchStmt
     ;
 
 switchBlock
-    : (CASE expr | DEFAULT) COLON statement*
+    : (CASE test | DEFAULT) COLON statement*
     ;
 
 withStmt
-    : WITH expr (AS ID)? COLON suite
+    : WITH expr (AS ID)? block
     ;
 
 assertStmt
-    : ASSERT expr (COMMA expr)?
+    : ASSERT expr (COMMA expr)? SEMICOLON?
     ;
 
 yieldStmt
@@ -379,29 +406,27 @@ deleteStmt
 raiseStmt
     : RAISE (expr (FROM expr)?)?
     ;
-    : LBRACE statement* RBRACE
-    ;
 
 exprStmt
     : expr
     ;
 
-expr
-    : primary
-    | expr op=(MUL | DIV) expr
-    | expr op=(PLUS | MINUS) expr
-    | expr ARROW ID
-    | expr ASSIGN expr
-    | expr LPAREN argList? RPAREN
-    ;
+// Previous expr rule removed (using the one defined earlier)
 
 primary
-    : INT
-    | FLOAT
-    | STRING
-    | BOOL
+    : NUMBER
+    | STRING_LITERAL
+    | TRUE
+    | FALSE
+    | NULL
+    | THIS
+    | SUPER
     | ID
+    | NONE
     | LPAREN expr RPAREN
+    | functionLiteral
+    | arrayLiteral
+    | dictionaryLiteral
     ;
 
 argList
@@ -418,24 +443,10 @@ eventHandler
 
 // Lexer Rules
 GUI : 'gui';
-ON : 'on';
-DO : 'do';
-FROM : 'from';
-DEF : 'def';
-PUBLIC : 'public';
-STATIC : 'static';
 TYPE_KW : 'type';
-VOID : 'void';
-
-ARROW : '->';
 COLON : ':';
 COMMA : ',';
 SEMICOLON : ';';
-ASSIGN : '=';
-PLUS : '+';
-MINUS : '-';
-MUL : '*';
-DIV : '/';
 
 LPAREN : '(';
 RPAREN : ')';
@@ -447,10 +458,125 @@ RBRACKET : ']';
 INT : [0-9]+;
 FLOAT : [0-9]+ '.' [0-9]*;
 STRING : '"' ~["\r\n]* '"' | '\'' ~['\r\n]* '\'';
-BOOL : 'true' | 'false';
 ID : [a-zA-Z_][a-zA-Z0-9_]*;
 
 INDENT : 'INDENT';
 DEDENT : 'DEDENT';
 NEWLINE : [\r\n]+;
 WS : [ \t]+ -> skip;
+// Missing rules to add to CPJ.g4
+
+exportStmt
+    : EXPORT (DEFAULT | STAR | LBRACE exportList RBRACE) (FROM qualifiedName)?
+    ;
+
+exportList
+    : ID (AS ID)? (COMMA ID (AS ID)?)*
+    ;
+
+parExpr
+    : LPAREN expr RPAREN
+    ;
+
+variableDecl
+    : (FINAL | CONST)? typeRef ID (ASSIGN expr)?
+    ;
+
+classBody
+    : LBRACE classMember* RBRACE
+    ;
+
+classMember
+    : (modifier)* (fieldDecl | methodDecl | constructorDecl | classDef)
+    ;
+
+interfaceBody
+    : LBRACE interfaceMember* RBRACE
+    ;
+
+interfaceMember
+    : (modifier)* (abstractMethodDecl | defaultMethodDecl | interfaceDef)
+    ;
+
+abstractMethodDecl
+    : typeRef ID LPAREN paramList? RPAREN SEMICOLON
+    ;
+
+defaultMethodDecl
+    : DEFAULT typeRef ID LPAREN paramList? RPAREN block
+    ;
+
+constructorDecl
+    : (modifier)* ID LPAREN paramList? RPAREN block
+    ;
+
+methodDecl
+    : typeRef ID LPAREN paramList? RPAREN (THROWS typeRef (COMMA typeRef)*)? block
+    ;
+
+fieldDecl
+    : typeRef ID (ASSIGN expr)? SEMICOLON
+    ;
+
+enumConstants
+    : enumConstant (COMMA enumConstant)*
+    ;
+
+enumConstant
+    : ID (LPAREN argList? RPAREN)? (classBody)?
+    ;
+
+enumBodyDeclarations
+    : SEMICOLON classMember*
+    ;
+
+forInit
+    : variableDecl
+    | expr (COMMA expr)*
+    ;
+
+forUpdate
+    : expr (COMMA expr)*
+    ;
+
+creator
+    : nonArrayCreator
+    | arrayCreator
+    ;
+
+nonArrayCreator
+    : typeRef LPAREN argList? RPAREN
+    ;
+
+arrayCreator
+    : typeRef LBRACKET (expr | RBRACKET (LBRACKET expr? RBRACKET)*) RBRACKET
+    ;
+
+functionLiteral
+    : FUNCTION? LPAREN paramList? RPAREN (COLON typeRef)? block
+    ;
+
+asyncStmt
+    : ASYNC (funcDef | withStmt | forStmt)
+    ;
+
+arrayLiteral
+    : LBRACKET (expr (COMMA expr)* COMMA?)? RBRACKET
+    ;
+
+dictionaryLiteral
+    : LBRACE (keyValue (COMMA keyValue)* COMMA?)? RBRACE
+    ;
+
+keyValue
+    : expr COLON expr
+    ;
+
+qualifiedName
+    : ID (DOT ID)*
+    ;
+
+variableModifier
+    : FINAL
+    | CONST
+    ;

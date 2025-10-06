@@ -1,6 +1,7 @@
 package cpj.ipc;
 
 import java.io.RandomAccessFile;
+import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
@@ -58,8 +59,14 @@ public class SharedMemory implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        file.close();
+    public void close() {
+        try {
+            System.out.println("Closing shared memory segment '" + name + "' of size " + size + " bytes");
+            buffer.force();
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

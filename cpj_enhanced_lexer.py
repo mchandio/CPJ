@@ -4,47 +4,13 @@ This lexer forms the foundation of our CPJ house, handling all core language fea
 and multi-language integration.
 """
 from antlr4 import Lexer, Token
-from typing import List, Set, Dict
-from enum import Enum, auto
+from typing import List, Set, Dict, Optional, Tuple, Union
+from cpj_enums import TokenType
 
-class TokenType(Enum):
-    # Foundation tokens
-    FUNCTION = auto()      # fn keyword
-    TYPE = auto()          # type keyword
-    MEMORY = auto()        # memory keyword
-    
-    # Structure tokens
-    LEFT_BRACE = auto()    # {
-    RIGHT_BRACE = auto()   # }
-    LEFT_PAREN = auto()    # (
-    RIGHT_PAREN = auto()   # )
-    LEFT_BRACKET = auto()  # [
-    RIGHT_BRACKET = auto() # ]
-    
-    # Room tokens (language integration)
-    CPP_BLOCK = auto()     # cpp { ... }
-    PYTHON_BLOCK = auto()  # python { ... }
-    JAVA_BLOCK = auto()    # java { ... }
-    
-    # Building material tokens
-    INT = auto()
-    FLOAT = auto()
-    STRING_TYPE = auto()
-    BOOL = auto()
-    VOID = auto()
-    
-    # Utility tokens
-    IDENTIFIER = auto()
-    STRING = auto()
-    NUMBER = auto()
-    INDENT = auto()
-    DEDENT = auto()
-    NEWLINE = auto()
-    EOF = auto()
-    ERROR = auto()
-    STRING_INTERP_START = auto()
-    STRING_INTERP_END = auto()
-    PREPROCESSOR = auto()
+
+
+
+from typing import Optional, Tuple
 
 class CPJEnhancedLexer:
     """Extends the base ANTLR4 generated lexer with advanced features.
@@ -121,7 +87,7 @@ class CPJEnhancedLexer:
         if indent > self.indentation_stack[-1]:
             # Indent
             self.indentation_stack.append(indent)
-            tokens.append(self.create_token(TokenType.INDENT, text, line, column))
+            tokens.append(self.create_token(TokenType.INDENT.value, text, line, column))
             
         elif indent < self.indentation_stack[-1]:
             # Dedent (possibly multiple levels)
@@ -202,10 +168,13 @@ class CPJEnhancedLexer:
             return '\0'
         return self.source[pos]
         
-    def create_token(self, type_: TokenType, text: str, line: int, column: int) -> Token:
+    def create_token(self, type_: Union[TokenType, int], text: str, line: int, column: int) -> Token:
         """Create a new token with the proper type"""
         token = Token()
-        token.type = type_
+        if isinstance(type_, TokenType):
+            token.type = type_.value
+        else:
+            token.type = type_
         token.text = text
         # Store line and column in token's hidden state
         setattr(token, 'line', line)

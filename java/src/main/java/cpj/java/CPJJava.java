@@ -3,10 +3,6 @@
 
 package cpj.java;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-
 public class CPJJava {
     public static void main(String[] args) {
         if (args.length < 1) {

@@ -1,0 +1,9 @@
+/home/me/CPJ/build/CMakeFiles/cpj_compiler.dir
+/home/me/CPJ/build/CMakeFiles/package.dir
+/home/me/CPJ/build/CMakeFiles/package_source.dir
+/home/me/CPJ/build/CMakeFiles/edit_cache.dir
+/home/me/CPJ/build/CMakeFiles/rebuild_cache.dir
+/home/me/CPJ/build/CMakeFiles/list_install_components.dir
+/home/me/CPJ/build/CMakeFiles/install.dir
+/home/me/CPJ/build/CMakeFiles/install/local.dir
+/home/me/CPJ/build/CMakeFiles/install/strip.dir

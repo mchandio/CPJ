@@ -1,6 +1,6 @@
 """Runtime management for decoration features."""
 
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Set, Callable
 from cpj_type_system import TypeSystem
 from cpj_house_decorations import (
     DecorationEventType, DecorationEvent, DecorationEventManager,
@@ -104,7 +104,7 @@ class DecorationRuntime:
         """List available color schemes"""
         return list(self._color_schemes.keys())
         
-    def subscribe_to_changes(self, callback: callable,
+    def subscribe_to_changes(self, callback: Callable[[DecorationEvent], None],
                            event_type: Optional[DecorationEventType] = None):
         """Subscribe to decoration changes"""
         if event_type:

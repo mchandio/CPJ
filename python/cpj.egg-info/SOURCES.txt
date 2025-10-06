@@ -6,9 +6,13 @@ python/cpj.egg-info/SOURCES.txt
 python/cpj.egg-info/dependency_links.txt
 python/cpj.egg-info/requires.txt
 python/cpj.egg-info/top_level.txt
+test/test_cpj_lexer.py
+test/test_cpj_parser.py
+test/test_cpj_type_system.py
 test/test_integration.py
 test/test_language_features.py
 test/test_parser.py
+test/test_type_system.py
 tests/test_advisor.py
 tests/test_advisor_apply.py
 tests/test_block_types_variants.py
