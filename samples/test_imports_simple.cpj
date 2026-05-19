@@ -1,0 +1,34 @@
+# Simple imports test
+
+import Math
+import String
+
+def test_math():
+    print("Testing Math module")
+    print("Math.PI =", Math.PI)
+    print("Math.E =", Math.E)
+    print("Math.sqrt(16) =", Math.sqrt(16))
+    print("Math.abs(-42) =", Math.abs(-42))
+    print()
+
+def test_string():
+    print("Testing String module")
+    text = "hello world"
+    print("Original:", text)
+    print("Upper:", String.upper(text))
+    print("Lower:", String.lower(text))
+    print("Title:", String.title(text))
+    print()
+
+def main():
+    print("=" * 50)
+    print("Testing CPJ Standard Library Imports")
+    print("=" * 50)
+    print()
+
+    test_math()
+    test_string()
+
+    print("=" * 50)
+    print("All tests passed!")
+    print("=" * 50)

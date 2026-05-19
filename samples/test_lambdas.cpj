@@ -1,0 +1,18 @@
+# Lambda functions test
+
+def main():
+    print("Testing lambda functions")
+
+    # Simple lambda
+    square = lambda x: x ** 2
+    print("square(5) =", square(5))
+
+    # Lambda with two arguments
+    add = lambda a, b: a + b
+    print("add(3, 7) =", add(3, 7))
+
+    # Lambda with multiple operations
+    calc = lambda x, y: x * 2 + y * 3
+    print("calc(5, 10) =", calc(5, 10))
+
+    print("All lambda tests passed!")

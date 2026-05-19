@@ -1,0 +1,12 @@
+# Minimal exception test
+
+def main():
+    print("Testing exceptions")
+
+    try:
+        x = 10 / 2
+        print("Result:", x)
+    except ZeroDivisionError:
+        print("Error!")
+
+    print("Done")

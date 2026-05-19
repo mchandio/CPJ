@@ -1,30 +1,18 @@
 CC=g++
 PYTHON=python3
-JAVAC=javac
+GRADLE=./gradlew
 
 
-all: cpj_compiler java_deps java_compile
+all: cpj_compiler java_compile python-install
 
 cpj_compiler:
 	$(CC) -o cpj_compiler cpj_compiler.cpp
 
-# Download Jackson JARs if not present
-lib/jackson-annotations-2.15.2.jar:
-	wget -O $@ https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar
-lib/jackson-core-2.15.2.jar:
-	wget -O $@ https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar
-lib/jackson-databind-2.15.2.jar:
-	wget -O $@ https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar
-
-java_deps: lib/jackson-annotations-2.15.2.jar lib/jackson-core-2.15.2.jar lib/jackson-databind-2.15.2.jar
-
-JAVA_CP=.:lib/*
-
-java_compile: java_deps
-	@if [ -d java/src/main/java ]; then \
-		mkdir -p bin && \
-		find java/src/main/java -name "*.java" -print0 | xargs -0 $(JAVAC) -cp $(JAVA_CP) -d bin; \
-	fi
+# Use Gradle to build Java components (includes ANTLR dependencies)
+java_compile:
+	@echo "Building Java components with Gradle..."
+	$(GRADLE) build -x test
+	@echo "Java build complete."
 
 run:
 	# Run the compiler against the sample CPJ program. Adjust the path as needed.
@@ -124,7 +112,7 @@ java-build:
 # CMake helper for C++: optional fetch nlohmann/json via FetchContent
 .PHONY: cpp-cmake
 cpp-cmake:
-	@mkdir -p build && cd build && \ 
+	@mkdir -p build && cd build && \
 		cmake -S .. -B . -DCPJ_BUILD_EXAMPLES=OFF || true
 
 src/runtime/memory_manager.cpp: src/runtime/memory_manager.h
@@ -147,4 +135,3 @@ test: test_runner
 	./test_runner
 
 .PHONY: test
-

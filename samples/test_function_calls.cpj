@@ -1,0 +1,13 @@
+# Test function calls in main
+
+def helper1():
+    print("Helper 1 called")
+
+def helper2():
+    print("Helper 2 called")
+
+def main():
+    print("Main starting")
+    helper1()
+    helper2()
+    print("Main done")

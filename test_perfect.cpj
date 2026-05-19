@@ -1,0 +1,8 @@
+# Perfect CPJ Test - No braces in original
+def test_basic():
+    x = 10
+    y = 20
+    result = x + y
+    print("Result:", result)
+
+test_basic()

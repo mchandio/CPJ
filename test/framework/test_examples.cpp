@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include <iostream>
 #include <thread>
 #include <chrono>
 

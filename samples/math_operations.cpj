@@ -1,0 +1,123 @@
+# CPJ Math Operations Sample
+# Demonstrates working arithmetic operations with classes and functions
+
+class MathOperations {
+    def add(a: int, b: int) -> int {
+        return a + b
+    }
+
+    def subtract(a: int, b: int) -> int {
+        return a - b
+    }
+
+    def multiply(a: int, b: int) -> int {
+        return a * b
+    }
+
+    def divide(a: int, b: int) -> float {
+        return a / b
+    }
+
+    def average(a: int, b: int) -> float {
+        return (a + b) / 2
+    }
+}
+
+class Calculator {
+    def power_of_two(n: int) -> int {
+        return n * n
+    }
+
+    def power_of_three(n: int) -> int {
+        return n * n * n
+    }
+
+    def double_value(n: int) -> int {
+        return n + n
+    }
+
+    def triple_value(n: int) -> int {
+        return n + n + n
+    }
+}
+
+def sum_two(x: int, y: int) -> int {
+    return x + y
+}
+
+def sum_three(x: int, y: int, z: int) -> int {
+    return x + y + z
+}
+
+def sum_four(a: int, b: int, c: int, d: int) -> int {
+    return a + b + c + d
+}
+
+def product_two(x: int, y: int) -> int {
+    return x * y
+}
+
+def product_three(x: int, y: int, z: int) -> int {
+    return x * y * z
+}
+
+def average_two(a: int, b: int) -> float {
+    return (a + b) / 2
+}
+
+def average_three(a: int, b: int, c: int) -> float {
+    return (a + b + c) / 3
+}
+
+def main() {
+    print("=== CPJ Math Operations Test ===")
+    print("")
+
+    print("Testing MathOperations class:")
+    math = MathOperations()
+    print("  25 + 15 =", math.add(25, 15))
+    print("  100 - 37 =", math.subtract(100, 37))
+    print("  12 * 8 =", math.multiply(12, 8))
+    print("  100 / 4 =", math.divide(100, 4))
+    print("  average(50, 70) =", math.average(50, 70))
+
+    print("")
+    print("Testing Calculator class:")
+    calc = Calculator()
+    print("  Power of 2 of 7 =", calc.power_of_two(7))
+    print("  Power of 3 of 5 =", calc.power_of_three(5))
+    print("  Double of 15 =", calc.double_value(15))
+    print("  Triple of 12 =", calc.triple_value(12))
+
+    print("")
+    print("Testing standalone functions:")
+    print("  sum_two(20, 30) =", sum_two(20, 30))
+    print("  sum_three(10, 20, 30) =", sum_three(10, 20, 30))
+    print("  sum_four(5, 10, 15, 20) =", sum_four(5, 10, 15, 20))
+    print("  product_two(6, 7) =", product_two(6, 7))
+    print("  product_three(2, 3, 4) =", product_three(2, 3, 4))
+    print("  average_two(10, 20) =", average_two(10, 20))
+    print("  average_three(10, 20, 30) =", average_three(10, 20, 30))
+
+    print("")
+    print("Testing nested function calls:")
+    result1 = math.add(sum_two(5, 10), product_two(3, 4))
+    print("  add(sum_two(5, 10), product_two(3, 4)) =", result1)
+
+    result2 = calc.power_of_two(sum_two(3, 4))
+    print("  power_of_two(sum_two(3, 4)) =", result2)
+
+    result3 = math.multiply(calc.double_value(5), calc.triple_value(2))
+    print("  multiply(double_value(5), triple_value(2)) =", result3)
+
+    print("")
+    print("Testing complex expressions:")
+    complex1 = math.add(math.multiply(2, 3), math.multiply(4, 5))
+    print("  (2 * 3) + (4 * 5) =", complex1)
+
+    complex2 = math.divide(math.add(100, 50), math.subtract(10, 5))
+    print("  (100 + 50) / (10 - 5) =", complex2)
+
+    print("")
+    print("=== All math operations completed successfully! ===")
+}

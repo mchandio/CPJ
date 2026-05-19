@@ -1,0 +1,177 @@
+# CPJ Control Flow Test
+# Comprehensive test of if/else, while, for loops, and lists
+
+class ControlFlowDemo {
+    def test_if_else(value: int) -> string {
+        if value > 10 {
+            return "greater than 10"
+        } else {
+            return "10 or less"
+        }
+    }
+
+    def test_nested_if(x: int, y: int) -> string {
+        if x > 0 {
+            if y > 0 {
+                return "both positive"
+            } else {
+                return "x positive, y not"
+            }
+        } else {
+            return "x not positive"
+        }
+    }
+
+    def count_to_n(n: int) -> int {
+        count = 0
+        i = 0
+        while i < n {
+            count = count + 1
+            i = i + 1
+        }
+        return count
+    }
+}
+
+def test_for_loop(limit: int) -> int {
+    total = 0
+    for i in range(limit) {
+        total = total + i
+    }
+    return total
+}
+
+def test_for_with_list() -> int {
+    numbers = [10, 20, 30, 40, 50]
+    sum = 0
+    for num in numbers {
+        sum = sum + num
+    }
+    return sum
+}
+
+def factorial(n: int) -> int {
+    result = 1
+    i = 1
+    while i <= n {
+        result = result * i
+        i = i + 1
+    }
+    return result
+}
+
+def fibonacci_sequence(n: int) -> int {
+    if n <= 1 {
+        return n
+    }
+    a = 0
+    b = 1
+    i = 2
+    while i <= n {
+        temp = a + b
+        a = b
+        b = temp
+        i = i + 1
+    }
+    return b
+}
+
+def sum_list(numbers: list) -> int {
+    total = 0
+    for num in numbers {
+        total = total + num
+    }
+    return total
+}
+
+def filter_positive(numbers: list) -> int {
+    count = 0
+    for num in numbers {
+        if num > 0 {
+            count = count + 1
+        }
+    }
+    return count
+}
+
+def main() {
+    print("=== CPJ Control Flow Test ===")
+    print("")
+
+    print("Testing if/else:")
+    demo = ControlFlowDemo()
+    result1 = demo.test_if_else(15)
+    print("  test_if_else(15) =", result1)
+    result2 = demo.test_if_else(5)
+    print("  test_if_else(5) =", result2)
+
+    print("")
+    print("Testing nested if:")
+    result3 = demo.test_nested_if(5, 10)
+    print("  test_nested_if(5, 10) =", result3)
+    result4 = demo.test_nested_if(5, -3)
+    print("  test_nested_if(5, -3) =", result4)
+
+    print("")
+    print("Testing while loop:")
+    result5 = demo.count_to_n(10)
+    print("  count_to_n(10) =", result5)
+
+    print("")
+    print("Testing for loop with range:")
+    result6 = test_for_loop(10)
+    print("  test_for_loop(10) =", result6)
+    print("  (sum of 0 to 9)")
+
+    print("")
+    print("Testing for loop with lists:")
+    my_list = [5, 10, 15, 20, 25]
+    result7 = sum_list(my_list)
+    print("  sum_list([5, 10, 15, 20, 25]) =", result7)
+
+    result8 = test_for_with_list()
+    print("  test_for_with_list() =", result8)
+
+    print("")
+    print("Testing factorial:")
+    fact5 = factorial(5)
+    print("  factorial(5) =", fact5)
+    fact7 = factorial(7)
+    print("  factorial(7) =", fact7)
+
+    print("")
+    print("Testing fibonacci:")
+    fib8 = fibonacci_sequence(8)
+    print("  fibonacci_sequence(8) =", fib8)
+    fib10 = fibonacci_sequence(10)
+    print("  fibonacci_sequence(10) =", fib10)
+
+    print("")
+    print("Testing filter with conditions:")
+    test_nums = [5, -3, 10, -8, 15, 0, -2, 20]
+    positive_count = filter_positive(test_nums)
+    print("  positive numbers in [5, -3, 10, -8, 15, 0, -2, 20] =", positive_count)
+
+    print("")
+    print("Testing empty and single-element lists:")
+    empty = []
+    single = [42]
+    print("  sum_list([]) =", sum_list(empty))
+    print("  sum_list([42]) =", sum_list(single))
+
+    print("")
+    print("Testing complex expressions:")
+    numbers = [1, 2, 3, 4, 5]
+    total = 0
+    for n in numbers {
+        if n > 2 {
+            total = total + n * 2
+        } else {
+            total = total + n
+        }
+    }
+    print("  complex calculation result =", total)
+
+    print("")
+    print("=== All control flow tests completed successfully! ===")
+}

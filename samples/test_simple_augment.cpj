@@ -1,0 +1,19 @@
+# Simple augmented assignment test
+
+def main():
+    print("Testing augmented assignment")
+
+    x = 10
+    print("x = 10")
+    x += 5
+    print("x += 5, result:", x)
+
+    y = 20
+    y -= 3
+    print("y = 20, y -= 3, result:", y)
+
+    z = 5
+    z *= 2
+    print("z = 5, z *= 2, result:", z)
+
+    print("Done!")

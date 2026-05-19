@@ -5,7 +5,7 @@
 [![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
 [![Coverage](https://codecov.io/gh/<OWNER>/<REPO>/branch/main/graph/badge.svg)](https://codecov.io/gh/<OWNER>/<REPO>)
 
-CPJ is a tri-language compiler and development environment that targets C++, Python, and Java. It includes a C++ core compiler, Python runtime helpers, and Java GUI generation support.
+CPJ is a multi-target compiler and development environment that targets C++, Python, Java, and standalone web output. It includes a C++ core compiler, Python runtime helpers, Java GUI generation support, and a browser target that emits self-contained HTML/CSS/JavaScript from `web { ... }` blocks.
 
 Canonical Quickstart
 
@@ -16,6 +16,21 @@ The easiest way to get started is the quickstart script that automates a minimal
 ```
 
 If you prefer to run the steps manually, see `docs/getting_started.md` for platform notes and step-by-step commands.
+
+Native Windows install
+
+CPJ now builds as a native Windows executable and can be installed from
+PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1
+cpj --help
+```
+
+The Windows build creates `build\windows\bin\cpj.exe`, stages
+`dist\cpj-windows`, and writes `dist\cpj-windows.zip`. Full details are in
+`docs/WINDOWS_INSTALL.md`.
 
 Badges
 
@@ -34,12 +49,18 @@ Alternatively the repo includes `scripts/update_badges.sh` which replaces the pl
 Full project documentation is in the `docs/` folder. Start at `docs/index.md` for a guided table of contents and walk-throughs:
 
 - `docs/index.md` — top-level documentation index and links
+- `docs/CPJ_PROGRAMMING_LANGUAGE_GUIDE.html` - complete standalone HTML5 guide for the CPJ programming language
 - `docs/getting_started.md` — quickstart and samples
+- `docs/WINDOWS_INSTALL.md` - native Windows binary build and install
 - `docs/developer_guide.md` — how to extend and develop CPJ
+- `docs/web.md` — standalone web target and `web { ... }` syntax
+- `docs/WEB_ENGINEERING_MATRIX.md` — web engineering coverage versus PHP, ASP, JS, HTML5, CSS, Django, Flask, and Figma-style workflows
+- `docs/WEB_STACK_COMPARISON.md` — comparison against PHP, ASP.NET, JavaScript, Python web frameworks, HTML5, CSS, and design tools
+- `docs/CPJPRESS.md` — WordPress-style CMS generated from CPJ
 
 
 ## Overview
-CPJ (Cyber Programming Jet) is a tri-language compiler and development environment supporting C++, Python, and Java. It enables seamless integration and execution of code across all three languages, with features for auto-detecting and installing Python libraries, Java GUI support, and unified orchestration.
+CPJ (Cyber Programming Jet) is a multi-target compiler and development environment supporting C++, Python, Java, and standalone browser applications. It enables seamless integration and execution across native, runtime, GUI, and web targets, with features for auto-detecting and installing Python libraries, Java GUI support, web generation, and unified orchestration.
 
 ## Language Features
 - Class and function definitions (C++/Java/Python style)
@@ -47,6 +68,10 @@ CPJ (Cyber Programming Jet) is a tri-language compiler and development environme
 - Print and input statements
 - Exception handling
 - GUI constructs (auto-generates Java Swing code)
+- Web constructs (auto-generates standalone HTML/CSS/JavaScript)
+- Web engineering constructs (components, routes, method-aware JSON APIs, binary uploads, middleware/guards, SQLite stores, server project output, OpenAPI, PWA files, form fetch, diagnostics, and design tokens)
+- Ecosystem web constructs (SQLite migrations, dependency-injected services, template inheritance, ESM/TypeScript-facing bundles, plugin marketplace metadata/hooks, and composed middleware pipelines)
+- CMS constructs (`cms { ... }`) for CPJPress-style posts, pages, users, sessions, comments, media metadata, plugin records, feeds, admin publishing, and JSON APIs
 - Integration with Python modules and Java GUI
 
 ## Example CPJ Program
@@ -72,7 +97,7 @@ print(x)
 - **Runtime Hooks:** C++ main calls Python and Java modules as needed, using connector scripts for seamless execution and data exchange.
 
 ## Integration Process
-1. **Code Generation:** CPJ compiler parses CPJ source and generates code for C++, Python, and Java as needed.
+1. **Code Generation:** CPJ compiler parses CPJ source and generates code for C++, Python, Java, and standalone web targets as needed.
 2. **Connector Module:** `cpj_connector.py` enables communication and execution between C++, Python, and Java components. Supports data exchange via files.
 3. **Orchestration:** `cpj_orchestrator.py` manages build and run workflow for all languages.
 4. **GUI Automation:** GUI constructs in CPJ source trigger auto-generation of Java Swing code, compilation, and execution.
@@ -81,6 +106,9 @@ print(x)
 ## Build and Run
 - Use the Makefile to build all components: `make clean && make`
 - Run the compiler: `./cpj_compiler samples/demo.cpj`
+- Emit only a standalone web app: `./cpj_compiler --web-only -o generated samples/web_app.cpj`
+- Emit a full standalone web project directly: `python -m tools.cpj_web_emitter samples/web_app.cpj -o generated/web/web_app.html --project-dir generated/web/web_app_project`
+- Generate CPJPress: `python -m tools.cpj_web_emitter samples/cpjpress.cpj -o generated/web/cpjpress.html --project-dir generated/web/cpjpress_project`
 
 ## Testing
 

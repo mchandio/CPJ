@@ -1,0 +1,163 @@
+# CPJ Simple Control Flow Test
+# Tests basic if/else, while, for loops, and lists
+
+class Calculator {
+    def is_positive(value: int) -> string {
+        if value > 0 {
+            return "positive"
+        } else {
+            return "not positive"
+        }
+    }
+
+    def is_even(value: int) -> string {
+        if value == 0 {
+            return "zero"
+        } else {
+            return "non-zero"
+        }
+    }
+
+    def count_up(n: int) -> int {
+        count = 0
+        i = 0
+        while i < n {
+            count = count + 1
+            i = i + 1
+        }
+        return count
+    }
+
+    def sum_range(n: int) -> int {
+        total = 0
+        i = 0
+        while i <= n {
+            total = total + i
+            i = i + 1
+        }
+        return total
+    }
+}
+
+def test_for_loop(limit: int) -> int {
+    total = 0
+    for i in range(limit) {
+        total = total + i
+    }
+    return total
+}
+
+def sum_list(numbers: list) -> int {
+    total = 0
+    for num in numbers {
+        total = total + num
+    }
+    return total
+}
+
+def factorial(n: int) -> int {
+    result = 1
+    i = 1
+    while i <= n {
+        result = result * i
+        i = i + 1
+    }
+    return result
+}
+
+def count_positive_list(numbers: list) -> int {
+    positive1 = [5, 10, 15, 20]
+    total = 0
+    for num in positive1 {
+        total = total + num
+    }
+    return total
+}
+
+def main() {
+    print("=== CPJ Control Flow Test ===")
+    print("")
+
+    print("Testing if/else statements:")
+    calc = Calculator()
+    result1 = calc.is_positive(10)
+    print("  is_positive(10) =", result1)
+    result2 = calc.is_positive(-5)
+    print("  is_positive(-5) =", result2)
+
+    result3 = calc.is_even(0)
+    print("  is_even(0) =", result3)
+    result4 = calc.is_even(7)
+    print("  is_even(7) =", result4)
+
+    print("")
+    print("Testing while loops:")
+    result5 = calc.count_up(10)
+    print("  count_up(10) =", result5)
+
+    result6 = calc.sum_range(10)
+    print("  sum_range(10) =", result6)
+
+    print("")
+    print("Testing for loops with range:")
+    result7 = test_for_loop(5)
+    print("  test_for_loop(5) =", result7)
+
+    result8 = test_for_loop(10)
+    print("  test_for_loop(10) =", result8)
+
+    print("")
+    print("Testing for loops with lists:")
+    numbers1 = [10, 20, 30, 40, 50]
+    result9 = sum_list(numbers1)
+    print("  sum_list([10, 20, 30, 40, 50]) =", result9)
+
+    numbers2 = [5, 10, 15]
+    result10 = sum_list(numbers2)
+    print("  sum_list([5, 10, 15]) =", result10)
+
+    print("")
+    print("Testing factorial:")
+    fact5 = factorial(5)
+    print("  factorial(5) =", fact5)
+
+    fact7 = factorial(7)
+    print("  factorial(7) =", fact7)
+
+    print("")
+    print("Testing another list sum:")
+    positive_count = count_positive_list([])
+    print("  sum of positive list =", positive_count)
+
+    print("")
+    print("Testing empty lists:")
+    empty = []
+    result11 = sum_list(empty)
+    print("  sum_list([]) =", result11)
+
+    print("")
+    print("Testing single element lists:")
+    single = [42]
+    result12 = sum_list(single)
+    print("  sum_list([42]) =", result12)
+
+    print("")
+    print("Testing large list:")
+    numbers3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    total = sum_list(numbers3)
+    print("  sum of [1..10] =", total)
+
+    print("")
+    print("Testing multiple lists:")
+    list1 = [100, 200, 300]
+    list2 = [10, 20, 30]
+    sum1 = sum_list(list1)
+    sum2 = sum_list(list2)
+    combined = sum1 + sum2
+    print("  sum_list([100, 200, 300]) =", sum1)
+    print("  sum_list([10, 20, 30]) =", sum2)
+    print("  combined total =", combined)
+
+    print("")
+    print("=== All tests completed successfully! ===")
+}

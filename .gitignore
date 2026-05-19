@@ -1,0 +1,39 @@
+# Local environments
+.venv/
+cpj_venv/
+.tools/
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+reports/
+
+# Build and generated output
+build/
+dist/
+generated/
+.gradle/
+bin/
+java/.gradle/
+java/build/
+java/bin/
+*.class
+*.o
+
+# Local release packages and binaries
+releases/
+cpj-local-release-*/
+cpj-local-release-*.tar.gz
+*.zip
+*.tar
+*.tar.gz
+*.exe
+cpj_compiler
+cpj_compiler_no_run
+cpj_cpp
+cpj_main
+cpj_standalone
+test_runner

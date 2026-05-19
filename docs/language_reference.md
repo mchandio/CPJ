@@ -34,12 +34,12 @@ Language Reference (v0.1)
 # CPJ Language Reference
 
 ## Overview
-CPJ is a unified programming language that seamlessly integrates C++, Python, and Java paradigms. It is designed for next-generation developers who demand performance, safety, and expressiveness.
+CPJ is a unified programming language that integrates C++, Python, Java, and standalone web paradigms. It is designed for next-generation developers who demand performance, safety, expressiveness, and direct browser delivery.
 
 ## Key Features
 - Unified type system
 - Advanced generics
-- Seamless interop between C++, Python, and Java
+- Seamless interop between C++, Python, Java, and standalone web output
 - Modern concurrency and memory safety
 - Cross-platform support
 

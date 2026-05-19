@@ -33,6 +33,10 @@ add_executable(cpj_compiler
     cpj_compiler.cpp
 )
 
+if(WIN32)
+    set_target_properties(cpj_compiler PROPERTIES OUTPUT_NAME cpj)
+endif()
+
 # Install rules
 install(TARGETS cpj_compiler
     RUNTIME DESTINATION bin

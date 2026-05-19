@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete HTML5 guide for CPJ, the Cyber Programming Language and standalone web engineering language.">
+  <title>CPJ Programming Language Guide</title>
+  <style>
+    :root {
+      --bg: #f7f7f4;
+      --paper: #ffffff;
+      --ink: #17202a;
+      --muted: #5f6c7b;
+      --line: #d9ded9;
+      --blue: #2457c5;
+      --green: #0f766e;
+      --rust: #b25519;
+      --plum: #7c3f8c;
+      --code: #101820;
+      --code-line: #223044;
+      --radius: 8px;
+      --shadow: 0 16px 44px rgba(30, 42, 58, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.58;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    code,
+    pre,
+    kbd {
+      font-family: "Cascadia Code", "Consolas", "SFMono-Regular", monospace;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+      background: #fbfbf8;
+      overflow: auto;
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .brand strong {
+      font-size: 1.1rem;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .search {
+      width: 100%;
+      min-height: 42px;
+      margin: 8px 0 18px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .nav a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.94rem;
+    }
+
+    .nav a:hover,
+    .nav a:focus {
+      background: #edf2ff;
+      color: var(--blue);
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .hero {
+      min-height: 72vh;
+      display: grid;
+      align-content: center;
+      gap: 24px;
+      padding: clamp(34px, 7vw, 84px);
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.68), rgba(247,247,244,0.98)),
+        repeating-linear-gradient(90deg, rgba(36,87,197,0.09) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(0deg, rgba(15,118,110,0.08) 0 1px, transparent 1px 72px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--green);
+      background: var(--paper);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 980px;
+      margin-bottom: 0;
+      font-size: clamp(2.7rem, 7vw, 6.1rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4.4vw, 3.25rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 860px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.2vw, 1.22rem);
+    }
+
+    .hero-actions,
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      border-color: var(--line);
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .status-grid,
+    .feature-grid,
+    .syntax-grid,
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+      gap: 14px;
+    }
+
+    .status-card,
+    .feature,
+    .matrix-item {
+      min-height: 128px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .status-card strong,
+    .feature strong,
+    .matrix-item strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--ink);
+    }
+
+    .status-card span,
+    .feature span,
+    .matrix-item span {
+      color: var(--muted);
+    }
+
+    .content-section {
+      padding: clamp(42px, 7vw, 78px) clamp(22px, 6vw, 76px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      gap: 8px;
+      max-width: 940px;
+      margin-bottom: 24px;
+    }
+
+    .section-head p,
+    .content-section > p {
+      max-width: 900px;
+      color: var(--muted);
+    }
+
+    .code-card {
+      margin: 16px 0;
+      border: 1px solid #263447;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--code);
+      box-shadow: var(--shadow);
+    }
+
+    .code-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--code-line);
+      color: #dbe6f4;
+      background: #172233;
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .copy {
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid #4b5d76;
+      border-radius: var(--radius);
+      background: #223044;
+      color: #f5f7fb;
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow: auto;
+      color: #eaf1fb;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      tab-size: 4;
+    }
+
+    .kw { color: #9bd3ff; }
+    .str { color: #f7c873; }
+    .cm { color: #93a4b8; }
+    .fn { color: #a7f3d0; }
+
+    .note {
+      padding: 16px;
+      border-left: 4px solid var(--rust);
+      background: #fff8f0;
+      color: #483425;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .visual-panel,
+    .reference-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .visual-panel {
+      min-height: 420px;
+      padding: 14px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 390px;
+      border-radius: var(--radius);
+      background: #fbfbf8;
+    }
+
+    .reference-panel {
+      padding: 18px;
+    }
+
+    .reference-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .reference-list li {
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .reference-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .reference-list code {
+      color: var(--plum);
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f4f1;
+      color: var(--ink);
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .hidden-by-search {
+      display: none;
+    }
+
+    footer {
+      padding: 28px clamp(22px, 6vw, 76px);
+      color: var(--muted);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .architecture {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero {
+        min-height: auto;
+      }
+
+      .reference-list li {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Guide navigation">
+      <div class="brand">
+        <strong>CPJ Guide</strong>
+        <span>Cyber Programming Language reference in HTML5.</span>
+      </div>
+      <input class="search" id="sectionSearch" type="search" placeholder="Search guide sections" aria-label="Search guide sections">
+      <nav class="nav">
+        <a href="#overview">Overview</a>
+        <a href="#install">Install</a>
+        <a href="#cli">CLI</a>
+        <a href="#syntax">Syntax</a>
+        <a href="#types">Types</a>
+        <a href="#functions">Functions</a>
+        <a href="#classes">Classes</a>
+        <a href="#control-flow">Control Flow</a>
+        <a href="#errors">Errors</a>
+        <a href="#gui">GUI</a>
+        <a href="#web">Web Engineering</a>
+        <a href="#ecosystem">Ecosystem Blocks</a>
+        <a href="#cpjpress">CPJPress</a>
+        <a href="#artifacts">Artifacts</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#reference">Reference</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="hero" id="overview">
+        <span class="eyebrow">CPJ - Cyber Programming Language</span>
+        <h1>Complete CPJ Programming Language Guide</h1>
+        <p class="lead">CPJ is a multi-target programming language and standalone web engineering language. A single `.cpj` source can generate Python, Java GUI code, browser HTML/CSS/JavaScript, dependency-free servers, APIs, SQLite stores, CPJPress CMS projects, and Windows-native tooling.</p>
+        <div class="hero-actions">
+          <a class="button" href="#install">Start With Install</a>
+          <a class="button secondary" href="#web">Read Web Blocks</a>
+          <a class="button secondary" href="#cpjpress">Run CPJPress</a>
+        </div>
+        <div class="status-grid" aria-label="CPJ status summary">
+          <div class="status-card"><strong>Native Windows</strong><span>Installable `cpj.exe` with `%LOCALAPPDATA%\CPJ` runtime lookup.</span></div>
+          <div class="status-card"><strong>Standalone Web</strong><span>HTML5, CSS, JavaScript, routes, APIs, OpenAPI, PWA, stores, uploads, and diagnostics.</span></div>
+          <div class="status-card"><strong>CPJPress CMS</strong><span>Posts, pages, admin, sessions, feeds, sitemap, plugins, and JSON APIs.</span></div>
+          <div class="status-card"><strong>Ecosystem Blocks</strong><span>Migrations, services, templates, bundles, marketplace hooks, and pipelines.</span></div>
+        </div>
+      </header>
+
+      <section class="content-section" id="install" data-search="windows install setup powershell cpj exe package">
+        <div class="section-head">
+          <span class="eyebrow">Installation</span>
+          <h2>Install CPJ On Windows</h2>
+          <p>CPJ installs as a native Windows command. The installer copies the compiler, runtime tools, standard library, docs, and samples into `%LOCALAPPDATA%\CPJ` and adds the `bin` folder to the user PATH.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Standalone installer</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>powershell -ExecutionPolicy Bypass -File D:\CPJ\CPJ\dist\CPJ-Setup-Windows.ps1
+CPJ
+CPJ --help</code></pre>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Build and install from source</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>powershell -ExecutionPolicy Bypass -File .\scripts\build_windows.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1
+cpj --web-only -o generated samples\web_app.cpj</code></pre>
+        </div>
+        <p class="note">Bare `CPJ` now prints readiness and usage. It does not try to compile a default sample into `C:\Windows\System32`.</p>
+      </section>
+
+      <section class="content-section" id="cli" data-search="cli command flags web only no run output generated help">
+        <div class="section-head">
+          <span class="eyebrow">Command Line</span>
+          <h2>Compiler CLI</h2>
+          <p>The `cpj` command compiles `.cpj` files into generated backends. For web work, `--web-only` emits a static HTML file plus a full standalone server project.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Command</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>cpj --help</code></td><td>Show usage and runtime root.</td></tr>
+              <tr><td><code>cpj source.cpj</code></td><td>Emit Python and standalone web output.</td></tr>
+              <tr><td><code>cpj --web-only -o generated source.cpj</code></td><td>Emit only the web target and do not run Python.</td></tr>
+              <tr><td><code>cpj --no-web --no-run source.cpj</code></td><td>Emit Python backend without generated web artifacts.</td></tr>
+              <tr><td><code>cpj -v source.cpj</code></td><td>Show generated subprocess commands.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-section" id="syntax" data-search="syntax comments print variables assignment cpj file structure">
+        <div class="section-head">
+          <span class="eyebrow">Language Basics</span>
+          <h2>CPJ Source Structure</h2>
+          <p>A CPJ file is a sequence of declarations, statements, and domain blocks. The compiler recognizes core language constructs plus specialized `GUI` and `web` blocks.</p>
+        </div>
+        <div class="syntax-grid">
+          <div class="feature"><strong>Comments</strong><span>Use `#` or `//` lines in web blocks. Ordinary language files follow the parser rules of the active frontend.</span></div>
+          <div class="feature"><strong>Statements</strong><span>Assignments, function calls, prints, returns, loops, conditionals, imports, and exceptions are supported by the Python emitter.</span></div>
+          <div class="feature"><strong>Blocks</strong><span>Curly braces group classes, functions, routes, sections, templates, stores, uploads, and CMS configuration.</span></div>
+          <div class="feature"><strong>Targets</strong><span>One source can feed Python runtime code, Java GUI generation, C++ compiler support, and standalone browser/server output.</span></div>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Hello CPJ</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">class</span> HelloWorld {
+    <span class="kw">def</span> <span class="fn">main</span>() {
+        print(<span class="str">"Hello, CPJ World!"</span>)
+    }
+}
+
+<span class="kw">def</span> <span class="fn">add</span>(a: int, b: int) -&gt; int {
+    <span class="kw">return</span> a + b
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="types" data-search="types int float bool string struct model fields type annotations">
+        <div class="section-head">
+          <span class="eyebrow">Types</span>
+          <h2>Types And Data Shapes</h2>
+          <p>CPJ supports primitive annotations, user-defined `struct` and `class` declarations, GUI coercion maps, web models, and SQLite store field types.</p>
+        </div>
+        <div class="matrix">
+          <div class="matrix-item"><strong>Primitive</strong><span>`int`, `float`, `double`, `bool`, `boolean`, `str`, `string`, `text`, `email`, `blob`.</span></div>
+          <div class="matrix-item"><strong>User-defined</strong><span>`struct Point { x: int y: int }` and `class Person { ... }`.</span></div>
+          <div class="matrix-item"><strong>Web model</strong><span>`model Contact { field email email required }` emits design metadata.</span></div>
+          <div class="matrix-item"><strong>Store field</strong><span>`store Lead { field email text required }` creates SQLite-backed API columns.</span></div>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Struct, class, model, store</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">struct</span> Point {
+    x: int
+    y: int
+}
+
+<span class="kw">class</span> Person {
+    name: string
+    age: int
+
+    <span class="kw">def</span> <span class="fn">greet</span>(self) {
+        print(<span class="str">"Hello, "</span> + self.name)
+    }
+}
+
+web {
+    model Contact {
+        field name string required
+        field email email required
+    }
+
+    store Lead {
+        field name text required
+        field email text required
+    }
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="functions" data-search="functions def return parameters lambda imports modules">
+        <div class="section-head">
+          <span class="eyebrow">Functions</span>
+          <h2>Functions And Modules</h2>
+          <p>Functions use `def`, optional type annotations, and `return`. The Python emitter supports calls, returns, imports, lambdas, comprehensions, attributes, subscript access, and common expression operators.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Function example</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">import</span> math
+
+<span class="kw">def</span> <span class="fn">area</span>(radius: float) -&gt; float {
+    <span class="kw">return</span> 3.14159 * radius * radius
+}
+
+<span class="kw">def</span> <span class="fn">main</span>() {
+    print(area(4.0))
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="classes" data-search="class struct object fields methods oop java python cpp">
+        <div class="section-head">
+          <span class="eyebrow">Objects</span>
+          <h2>Classes And Structs</h2>
+          <p>Use `struct` for simple field containers and `class` for fields plus methods. CPJ maps these constructs across the available backends where supported.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Object-oriented CPJ</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">class</span> Counter {
+    value: int
+
+    <span class="kw">def</span> <span class="fn">inc</span>(self) {
+        self.value = self.value + 1
+        <span class="kw">return</span> self.value
+    }
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="control-flow" data-search="if else while for list dict comprehension boolean operators">
+        <div class="section-head">
+          <span class="eyebrow">Flow</span>
+          <h2>Control Flow And Expressions</h2>
+          <p>CPJ supports familiar imperative flow: `if`, `while`, `for`, boolean expressions, binary operators, lists, dictionaries, comparisons, and comprehensions through the Python-oriented emitter path.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Control flow</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">def</span> <span class="fn">score</span>(items) {
+    total = 0
+    <span class="kw">for</span> item <span class="kw">in</span> items {
+        <span class="kw">if</span> item &gt; 0 {
+            total = total + item
+        }
+    }
+    <span class="kw">return</span> total
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="errors" data-search="error exception try except raise diagnostics">
+        <div class="section-head">
+          <span class="eyebrow">Errors</span>
+          <h2>Error Handling And Diagnostics</h2>
+          <p>CPJ supports `try`, exception handlers, `raise`, and generated diagnostics in the web target. Web diagnostics report SEO, accessibility, and security warnings.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Exception shape</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code><span class="kw">try</span> {
+    result = risky_call()
+} <span class="kw">except</span> Error <span class="kw">as</span> err {
+    print(err)
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="gui" data-search="gui java swing widgets coercion buttons fields sliders checkbox">
+        <div class="section-head">
+          <span class="eyebrow">GUI</span>
+          <h2>Desktop GUI Blocks</h2>
+          <p>The `GUI` block generates Java Swing-oriented interfaces. Widget type annotations help the runtime coerce form data before handler calls.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>GUI block</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>GUI {
+    types {"count":"int", "flag":"bool"}
+    addTextField("count")
+    addCheckbox("flag")
+    addButton("Go", handler(count, flag))
+    show()
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="web" data-search="web html5 css javascript routes api pwa forms upload guard middleware openapi sqlite">
+        <div class="section-head">
+          <span class="eyebrow">Standalone Web</span>
+          <h2>Web Engineering In CPJ</h2>
+          <p>The `web` block is CPJ's standalone web engineering surface. It emits a static `index.html`, embedded browser runtime, generated `server.py`, OpenAPI, PWA files, design tokens, component inventory, diagnostics, SQLite stores, upload handlers, and routes.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Complete web block</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>web {
+    title "CPJ Web Engineering"
+    meta description "A standalone CPJ web application."
+    pwa "CPJ Web Engineering"
+    theme primary "#2457c5"
+    server port 8080
+
+    middleware security {
+        header "X-Content-Type-Options" "nosniff"
+        cors "*"
+        request-id true
+    }
+
+    guard upload_token {
+        path "/api/uploads/media"
+        token "dev-token"
+    }
+
+    component stack_badge {
+        badge "HTML5 + CSS + JS + API"
+    }
+
+    api "/api/health" {
+        json status "ok"
+        json cpj true
+    }
+
+    store Lead {
+        field name text required
+        field email text required
+        seed name "Ada" email "ada@example.com"
+    }
+
+    upload media {
+        path "/api/uploads/media"
+        dir "uploads/media"
+        accept "text/plain"
+        max-bytes 2048
+    }
+
+    route "/dashboard" {
+        h1 "CPJ server route"
+        p "Rendered by the generated dependency-free CPJ server."
+    }
+
+    hero {
+        use stack_badge
+        h1 "Build browser apps in CPJ"
+        button "Open Dashboard" -&gt; "/dashboard"
+    }
+}</code></pre>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><strong>HTML5</strong><span>Sections, heroes, headings, paragraphs, images, buttons, forms, inputs, lists, and navigation.</span></div>
+          <div class="feature"><strong>CSS</strong><span>Theme tokens, responsive layouts, cards, grids, custom CSS, container queries, and animations.</span></div>
+          <div class="feature"><strong>JavaScript</strong><span>Embedded `window.CPJ`, state, events, counters, fetch forms, custom JavaScript, and PWA registration.</span></div>
+          <div class="feature"><strong>Server</strong><span>Routes, JSON APIs, POST/PUT/PATCH/DELETE parsing, uploads, guards, stores, and OpenAPI.</span></div>
+        </div>
+      </section>
+
+      <section class="content-section" id="ecosystem" data-search="migration service dependency injection template inheritance bundle typescript marketplace pipeline middleware">
+        <div class="section-head">
+          <span class="eyebrow">Ecosystem Blocks</span>
+          <h2>Framework-Level Web Features</h2>
+          <p>CPJ includes the ecosystem primitives expected from larger frameworks while keeping generated projects dependency-free.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Block</th><th>Purpose</th><th>Generated output</th></tr></thead>
+            <tbody>
+              <tr><td><code>service</code></td><td>Declare injectable constants and environment values.</td><td>`/__cpj/services`, API injection payloads.</td></tr>
+              <tr><td><code>migration</code></td><td>Add SQLite columns and indexes safely.</td><td>`cpj_migrations` table and ALTER/INDEX operations.</td></tr>
+              <tr><td><code>template</code></td><td>Define reusable route layouts with `slot content`.</td><td>Server-rendered routes with inherited markup.</td></tr>
+              <tr><td><code>bundle</code></td><td>Emit TypeScript-facing browser bundle artifacts.</td><td>`.bundle.js`, `.d.ts`, `tsconfig.json`.</td></tr>
+              <tr><td><code>marketplace</code></td><td>Declare plugins and hooks.</td><td>`plugins.marketplace.json`, `/__cpj/plugins`, hook injection.</td></tr>
+              <tr><td><code>pipeline</code></td><td>Compose middleware, headers, request IDs, and request checks.</td><td>Runtime middleware pipeline enforcement.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Ecosystem example</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>web {
+    service site_config {
+        value tier "standalone-web-engineering"
+        env mode "CPJ_MODE" "development"
+    }
+
+    pipeline production {
+        use security
+        header "X-CPJ-Pipeline" "production"
+        require-header "X-CPJ-Token" "dev-token" path "/api/protected"
+    }
+
+    template app_shell {
+        section shell {
+            h2 "Template shell"
+            slot content
+        }
+    }
+
+    bundle app {
+        target es2022
+        module esm
+        types true
+    }
+
+    marketplace CPJHub {
+        registry "local"
+        plugin seo "SEO Helper" "1.0.0" "Adds head metadata hooks."
+        hook seo head "&lt;meta name='robots' content='index,follow'&gt;"
+    }
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="cpjpress" data-search="cpjpress wordpress cms posts pages admin login sessions rss sitemap plugins">
+        <div class="section-head">
+          <span class="eyebrow">CMS</span>
+          <h2>CPJPress</h2>
+          <p>CPJPress is CPJ's WordPress-style CMS baseline. It is not a PHP WordPress clone; it is a CPJ-native CMS generated from a `.cpj` file.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>CPJPress source</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>web {
+    title "CPJPress"
+    server port 8090
+    pwa "CPJPress"
+
+    cms CPJPress {
+        site "CPJPress"
+        blog "/blog"
+        admin "/admin"
+        storage "cpjpress_content.json"
+        user admin admin admin "Administrator"
+        plugin seo "SEO Helper" "Adds metadata hooks."
+        post "hello-cpjpress" "Hello CPJPress" "This is a CPJ CMS post."
+        page "about" "About CPJPress" "A CPJ-native CMS baseline."
+        comment "hello-cpjpress" "First Reader" "Generated from CPJ."
+    }
+
+    hero {
+        h1 "WordPress-style publishing in CPJ"
+        button "View Posts" -&gt; "/blog"
+        button "Open Admin" -&gt; "/admin"
+    }
+}</code></pre>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><strong>Content</strong><span>Posts, pages, categories, comments, media metadata, and seeded content.</span></div>
+          <div class="feature"><strong>Admin</strong><span>Login, sessions, admin publishing, media records, and seeded users.</span></div>
+          <div class="feature"><strong>APIs</strong><span><code>/api/posts</code>, <code>/api/comments</code>, <code>/api/media</code>, <code>/api/plugins</code>, OpenAPI, RSS, and sitemap.</span></div>
+          <div class="feature"><strong>Runtime</strong><span>Dependency-free Python standard-library server with CPJ stores, middleware, services, and marketplace metadata.</span></div>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>Run CPJPress</span><button class="copy" data-copy>Copy</button></div>
+          <pre><code>cpj --web-only -o build\run-cpjpress samples\cpjpress.cpj
+cd build\run-cpjpress\web\cpjpress.cpj_project
+python server.py
+
+start http://127.0.0.1:8090
+login admin / admin</code></pre>
+        </div>
+      </section>
+
+      <section class="content-section" id="artifacts" data-search="generated files artifacts html server openapi diagnostics tokens components pwa bundle installer">
+        <div class="section-head">
+          <span class="eyebrow">Generated Files</span>
+          <h2>What CPJ Emits</h2>
+          <p>The web project emitter writes a complete inspectable project. Static-only apps can open the generated HTML directly; server apps run with Python standard library only.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>index.html</code></td><td>Standalone browser UI with embedded CSS and JavaScript runtime.</td></tr>
+              <tr><td><code>server.py</code></td><td>Dependency-free local web server with routes, APIs, stores, uploads, middleware, and diagnostics endpoints.</td></tr>
+              <tr><td><code>openapi.json</code></td><td>API contract for CPJ generated APIs, stores, uploads, CMS endpoints, services, and plugin registry.</td></tr>
+              <tr><td><code>design.tokens.json</code></td><td>Figma-style token handoff including colors, components, models, services, migrations, bundle, and marketplace data.</td></tr>
+              <tr><td><code>components.json</code></td><td>Component, route, API, CMS, guard, middleware, pipeline, template, and store inventory.</td></tr>
+              <tr><td><code>diagnostics.json</code></td><td>Accessibility, SEO, security, database, template, and dependency-injection diagnostics.</td></tr>
+              <tr><td><code>manifest.webmanifest</code> and <code>sw.js</code></td><td>PWA install and offline baseline.</td></tr>
+              <tr><td><code>*.bundle.js</code>, <code>*.d.ts</code>, <code>tsconfig.json</code></td><td>TypeScript-facing browser bundle artifacts.</td></tr>
+              <tr><td><code>plugins.marketplace.json</code></td><td>Plugin registry and hook metadata.</td></tr>
+              <tr><td><code>cpjpress_runtime.py</code></td><td>Generated CMS runtime copied into CPJPress projects.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-section" id="architecture" data-search="architecture compiler emitter runtime python java cpp web browser server">
+        <div class="section-head">
+          <span class="eyebrow">Architecture</span>
+          <h2>How CPJ Fits Together</h2>
+          <p>The C++ compiler front door invokes Python emitters for backend and web targets. The web emitter produces browser and server artifacts; CPJPress adds a CMS runtime.</p>
+        </div>
+        <div class="architecture">
+          <div class="visual-panel">
+            <canvas id="architectureCanvas" width="960" height="520" aria-label="CPJ architecture diagram"></canvas>
+          </div>
+          <div class="reference-panel">
+            <h3>Architecture Layers</h3>
+            <ul class="reference-list">
+              <li><code>cpj.exe</code><span>Native Windows command and compiler entry point.</span></li>
+              <li><code>tools/</code><span>Python parser, emitter, web emitter, package helpers, and CPJPress runtime.</span></li>
+              <li><code>stdlib/</code><span>CPJ standard library modules.</span></li>
+              <li><code>samples/</code><span>Reference CPJ programs and web/CMS examples.</span></li>
+              <li><code>dist/</code><span>Windows package and standalone installer.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section" id="reference" data-search="reference cheat sheet blocks syntax summary complete">
+        <div class="section-head">
+          <span class="eyebrow">Reference</span>
+          <h2>CPJ Cheat Sheet</h2>
+          <p>This quick reference summarizes the language-level blocks used in modern CPJ projects.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Syntax</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>class Name { ... }</code></td><td>Declare class fields and methods.</td></tr>
+              <tr><td><code>struct Name { ... }</code></td><td>Declare a simple data structure.</td></tr>
+              <tr><td><code>def name(args) { ... }</code></td><td>Declare a function.</td></tr>
+              <tr><td><code>GUI { ... }</code></td><td>Generate desktop GUI runtime behavior.</td></tr>
+              <tr><td><code>web { ... }</code></td><td>Generate standalone HTML5/web/server artifacts.</td></tr>
+              <tr><td><code>component name { ... }</code></td><td>Define reusable web markup.</td></tr>
+              <tr><td><code>template name { slot content }</code></td><td>Define a route layout with content insertion.</td></tr>
+              <tr><td><code>route "/path" { ... }</code></td><td>Define server-rendered HTML route.</td></tr>
+              <tr><td><code>api "/path" { json key value }</code></td><td>Define method-aware JSON API.</td></tr>
+              <tr><td><code>store Name { field ... }</code></td><td>Define SQLite-backed CRUD API.</td></tr>
+              <tr><td><code>migration name { ... }</code></td><td>Add store fields and indexes.</td></tr>
+              <tr><td><code>upload name { ... }</code></td><td>Define multipart binary upload endpoint.</td></tr>
+              <tr><td><code>middleware name { ... }</code></td><td>Define response headers, CORS, logging, request ID, and header checks.</td></tr>
+              <tr><td><code>pipeline name { use ... }</code></td><td>Compose middleware into a runtime pipeline.</td></tr>
+              <tr><td><code>guard name { path ... token ... }</code></td><td>Protect paths with bearer or `X-CPJ-Token` tokens.</td></tr>
+              <tr><td><code>service name { ... }</code></td><td>Declare dependency-injected runtime values.</td></tr>
+              <tr><td><code>bundle name { ... }</code></td><td>Emit browser bundle and TypeScript declaration artifacts.</td></tr>
+              <tr><td><code>marketplace name { ... }</code></td><td>Declare plugin registry and HTML hooks.</td></tr>
+              <tr><td><code>cms CPJPress { ... }</code></td><td>Generate WordPress-style CMS runtime.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tag-list" aria-label="Guide keywords">
+          <span class="tag">HTML5</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Python</span>
+          <span class="tag">Java GUI</span>
+          <span class="tag">SQLite</span>
+          <span class="tag">OpenAPI</span>
+          <span class="tag">PWA</span>
+          <span class="tag">CPJPress</span>
+          <span class="tag">Windows installer</span>
+        </div>
+      </section>
+
+      <footer>
+        <p>Generated guide for CPJ. Source docs: README, web engineering matrix, CPJPress docs, Windows install docs, and language reference.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const search = document.querySelector('#sectionSearch');
+    const sections = [...document.querySelectorAll('.content-section')];
+    const navLinks = [...document.querySelectorAll('.nav a')];
+
+    search.addEventListener('input', () => {
+      const query = search.value.trim().toLowerCase();
+      sections.forEach((section) => {
+        const haystack = `${section.id} ${section.dataset.search || ''} ${section.textContent}`.toLowerCase();
+        section.classList.toggle('hidden-by-search', Boolean(query) && !haystack.includes(query));
+      });
+    });
+
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.closest('.code-card').querySelector('code').innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          button.textContent = 'Copied';
+          setTimeout(() => button.textContent = 'Copy', 1200);
+        } catch {
+          button.textContent = 'Select';
+          setTimeout(() => button.textContent = 'Copy', 1200);
+        }
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((link) => {
+          link.toggleAttribute('aria-current', link.getAttribute('href') === `#${entry.target.id}`);
+        });
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    sections.forEach((section) => observer.observe(section));
+    observer.observe(document.querySelector('#overview'));
+
+    function drawArchitecture() {
+      const canvas = document.querySelector('#architectureCanvas');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.scale(dpr, dpr);
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const nodes = [
+        { id: 'source', label: '.cpj source', x: w * 0.08, y: h * 0.12, c: '#2457c5' },
+        { id: 'compiler', label: 'cpj.exe compiler', x: w * 0.38, y: h * 0.12, c: '#0f766e' },
+        { id: 'emitters', label: 'Python emitters', x: w * 0.68, y: h * 0.12, c: '#b25519' },
+        { id: 'python', label: 'Python backend', x: w * 0.12, y: h * 0.56, c: '#7c3f8c' },
+        { id: 'java', label: 'Java GUI', x: w * 0.36, y: h * 0.56, c: '#2457c5' },
+        { id: 'web', label: 'HTML/CSS/JS', x: w * 0.60, y: h * 0.56, c: '#0f766e' },
+        { id: 'cms', label: 'CPJPress CMS', x: w * 0.80, y: h * 0.56, c: '#b25519' }
+      ];
+
+      function box(node) {
+        const bw = Math.min(170, w * 0.23);
+        const bh = 58;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = node.c;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(node.x, node.y, bw, bh, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = node.c;
+        ctx.font = '700 14px system-ui, sans-serif';
+        ctx.fillText(node.label, node.x + 12, node.y + 34);
+        return { x: node.x, y: node.y, w: bw, h: bh };
+      }
+
+      function line(a, b) {
+        const from = boxes[a];
+        const to = boxes[b];
+        ctx.strokeStyle = '#7b8796';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(from.x + from.w, from.y + from.h / 2);
+        ctx.bezierCurveTo(from.x + from.w + 35, from.y + from.h / 2, to.x - 35, to.y + to.h / 2, to.x, to.y + to.h / 2);
+        ctx.stroke();
+      }
+
+      const boxes = {};
+      nodes.forEach((node) => boxes[node.id] = box(node));
+      line('source', 'compiler');
+      line('compiler', 'emitters');
+      ['python', 'java', 'web', 'cms'].forEach((target) => line('emitters', target));
+    }
+
+    if (CanvasRenderingContext2D.prototype.roundRect) {
+      drawArchitecture();
+      window.addEventListener('resize', drawArchitecture);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+web {
+    title "CPJ Web Engineering"
+    meta description "A standalone CPJ web application compiled to one HTML file."
+    pwa "CPJ Web Engineering"
+    theme primary "#2457c5"
+    theme accent "#b25519"
+    server port 8080
+    css ".cpj-stack-note { border-left: 4px solid var(--cpj-accent); padding-left: 14px; }"
+    js "document.addEventListener('cpj:form-submit', event => console.log('CPJ form', event.detail));"
+
+    middleware security {
+        header "X-Content-Type-Options" "nosniff"
+        header "X-Frame-Options" "DENY"
+        cors "*"
+        log true
+        request-id true
+    }
+
+    pipeline production {
+        use security
+        header "X-CPJ-Pipeline" "production"
+        require-header "X-CPJ-Token" "dev-token" path "/api/protected"
+    }
+
+    service site_config {
+        value tier "standalone-web-engineering"
+        env mode "CPJ_MODE" "development"
+    }
+
+    guard upload_token {
+        path "/api/uploads/media"
+        token "dev-token"
+    }
+
+    template app_shell {
+        section shell {
+            h2 "Template shell"
+            slot content
+        }
+    }
+
+    bundle app {
+        target es2022
+        module esm
+        types true
+        export CPJ
+    }
+
+    marketplace CPJHub {
+        registry "local"
+        plugin seo "SEO Helper" "1.0.0" "Adds head metadata hooks."
+        hook seo head "<meta name='robots' content='index,follow'>"
+    }
+
+    container feature_cards {
+        selector ".cpj-card"
+        min-width "360px"
+        css ".cpj-card { border-color: var(--cpj-primary); }"
+    }
+
+    animation rise_in {
+        duration "360ms"
+        from "opacity: 0; transform: translateY(10px);"
+        to "opacity: 1; transform: translateY(0);"
+        apply ".cpj-card"
+    }
+
+    component stack_badge {
+        badge "HTML5 + CSS + JS + API + Design Tokens"
+    }
+
+    model Contact {
+        field name string required
+        field email email required
+        field message text required
+    }
+
+    api "/api/health" {
+        json status "ok"
+        json cpj true
+        json runtime "standalone-web-engineering"
+    }
+
+    api "/api/contact" {
+        method POST
+        inject site_config
+        json status "received"
+        json handler "cpj-generated-api"
+    }
+
+    api "/api/protected" {
+        json status "pipeline-protected"
+    }
+
+    store Lead {
+        field name text required
+        field email text required
+        field message text
+        seed name "Ada" email "ada@example.com" message "Seeded from CPJ into SQLite."
+    }
+
+    migration lead_v2 {
+        store Lead
+        add-field source text
+        index email unique
+    }
+
+    upload media {
+        path "/api/uploads/media"
+        dir "uploads/media"
+        accept "text/plain"
+        max-bytes 2048
+    }
+
+    route "/dashboard" extends app_shell {
+        h1 "CPJ server route"
+        p "This page is rendered by the generated dependency-free CPJ server."
+    }
+
+    nav "Home" "#hero"
+    nav "Features" "#features"
+    nav "Playground" "#playground"
+
+    hero {
+        use stack_badge
+        h1 "Build browser apps in CPJ"
+        p "CPJ can now describe interfaces, styles, local JavaScript, routes, APIs, data models, and design tokens from one source file."
+        button "Explore Features" -> "#features"
+        button "Try Counter" -> "#playground"
+    }
+
+    section features {
+        h2 "Language-level web primitives"
+        p "Use CPJ blocks for pages, sections, components, cards, forms, fields, navigation, backend routes, JSON APIs, and small local interactions."
+        grid {
+            card "HTML5 + CSS" "Generated pages use semantic HTML, responsive CSS, forms, navigation, sections, media, and design tokens."
+            card "JavaScript runtime" "Forms, fetch submits, counters, state, PWA registration, and custom JS run through a tiny embedded CPJ browser runtime."
+            card "Server/API layer" "The project emitter generates a Python standard-library server with method-aware APIs, routes, POST handling, and OpenAPI metadata."
+            card "Stores and uploads" "SQLite-backed stores and guarded binary upload endpoints are generated directly from CPJ blocks."
+            card "Design handoff" "Generated design.tokens.json and components.json provide a Figma-style bridge for tokens and component inventory."
+        }
+    }
+
+    section playground {
+        h2 "Interactive surface"
+        p "This counter and contact form run locally from generated JavaScript."
+        counter demo_count "Demo counter" 3
+        p "The same source also emits /api/health and /dashboard in the generated server project."
+        form contact -> "/api/contact" POST {
+            input name "Your name" text required
+            input email "Email" email required
+            textarea message "Message" required
+            button "Send to CPJ API"
+        }
+    }
+}

@@ -1,0 +1,83 @@
+# CPJ Tri-Language Compiler Test
+# Tests basic arithmetic and function calls
+
+class Calculator {
+    def add(x: int, y: int) -> int {
+        return x + y
+    }
+
+    def subtract(x: int, y: int) -> int {
+        return x - y
+    }
+
+    def multiply(a: int, b: int) -> int {
+        return a * b
+    }
+
+    def divide(a: int, b: int) -> int {
+        return a / b
+    }
+}
+
+def square(n: int) -> int {
+    return n * n
+}
+
+def cube(n: int) -> int {
+    return n * n * n
+}
+
+def sum_three(a: int, b: int, c: int) -> int {
+    return a + b + c
+}
+
+def average(a: int, b: int) -> int {
+    return (a + b) / 2
+}
+
+def main() {
+    print("=== CPJ Tri-Language Compiler Test ===")
+    print("")
+
+    print("Testing Calculator class:")
+    calc = Calculator()
+
+    result1 = calc.add(15, 25)
+    print("  15 + 25 =", result1)
+
+    result2 = calc.subtract(100, 42)
+    print("  100 - 42 =", result2)
+
+    result3 = calc.multiply(7, 8)
+    print("  7 * 8 =", result3)
+
+    result4 = calc.divide(144, 12)
+    print("  144 / 12 =", result4)
+
+    print("")
+    print("Testing standalone functions:")
+
+    sq5 = square(5)
+    print("  square(5) =", sq5)
+
+    cb4 = cube(4)
+    print("  cube(4) =", cb4)
+
+    sum123 = sum_three(10, 20, 30)
+    print("  sum_three(10, 20, 30) =", sum123)
+
+    avg = average(50, 70)
+    print("  average(50, 70) =", avg)
+
+    print("")
+    print("Testing nested calls:")
+
+    nested1 = calc.add(square(3), cube(2))
+    print("  add(square(3), cube(2)) =", nested1)
+
+    nested2 = calc.multiply(square(4), 2)
+    print("  multiply(square(4), 2) =", nested2)
+
+    print("")
+    print("=== All tests completed successfully! ===")
+}

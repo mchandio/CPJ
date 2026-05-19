@@ -1,0 +1,94 @@
+web {
+    title "CPJPress"
+    meta description "A WordPress-style CMS generated from CPJ."
+    pwa "CPJPress"
+    theme primary "#185abd"
+    theme accent "#b25519"
+    server port 8090
+
+    middleware security {
+        header "X-Content-Type-Options" "nosniff"
+        cors "*"
+        request-id true
+    }
+
+    pipeline cms_pipeline {
+        use security
+        header "X-CPJ-CMS" "CPJPress"
+    }
+
+    service cms_config {
+        value edition "cpjpress-standalone"
+        env mode "CPJPRESS_MODE" "development"
+    }
+
+    store Subscriber {
+        field email text required
+        field source text
+        seed email "reader@example.com" source "cpjpress"
+    }
+
+    migration subscriber_v2 {
+        store Subscriber
+        add-field tags text
+        index email unique
+    }
+
+    bundle cmsapp {
+        target es2022
+        module esm
+        types true
+    }
+
+    marketplace CPJPressHub {
+        registry "local"
+        plugin seo "SEO Helper" "1.0.0" "Adds metadata hooks for generated CPJPress pages."
+        plugin forms "Form Bridge" "1.0.0" "Provides a placeholder plugin record for form integrations."
+        hook seo head "<meta name='robots' content='index,follow'>"
+    }
+
+    cms CPJPress {
+        site "CPJPress"
+        blog "/blog"
+        admin "/admin"
+        storage "cpjpress_content.json"
+        category "Announcements"
+        category "Engineering"
+        user admin admin admin "Administrator"
+        setting posts_per_page 10
+        plugin seo "SEO Helper" "Adds metadata hooks for generated CPJPress pages."
+        plugin forms "Form Bridge" "Provides a placeholder plugin record for form integrations."
+        media hero "CPJPress Hero" "/static/hero.png" "CPJPress editorial hero image"
+        post "hello-cpjpress" "Hello CPJPress" "This is a WordPress-style post stored and served by a generated CPJ standalone CMS."
+        post "why-cpj" "Why CPJ for web engineering" "CPJ can now emit pages, routes, APIs, design tokens, and a CMS server from one CPJ source."
+        page "about" "About CPJPress" "CPJPress is not WordPress PHP. It is a CPJ-native standalone CMS baseline inspired by WordPress architecture."
+        comment "hello-cpjpress" "First Reader" "This looks like WordPress-style publishing in CPJ."
+    }
+
+    component cms_badge {
+        badge "CPJ Native CMS"
+    }
+
+    nav "Home" "#hero"
+    nav "Posts" "/blog"
+    nav "Admin" "/admin"
+    nav "API" "/api/posts"
+
+    hero {
+        use cms_badge
+        h1 "WordPress-style publishing in CPJ"
+        p "CPJPress generates a complete CMS project with post storage, admin publishing, blog routes, JSON APIs, OpenAPI, components, and design tokens."
+        button "View Posts" -> "/blog"
+        button "Open Admin" -> "/admin"
+    }
+
+    section features {
+        h2 "What CPJPress includes"
+        grid {
+            card "Posts and pages" "Seed content is defined in CPJ and persisted to JSON by the generated server."
+            card "Admin and users" "The generated /admin screen uses CPJPress sessions and seeded CMS users."
+            card "Comments and media" "CPJPress includes comment handling, media metadata, RSS, sitemap, search, and plugin records."
+            card "API first" "Generated post, comment, media, and plugin endpoints make the CMS programmable."
+        }
+    }
+}

@@ -1,0 +1,54 @@
+# Exception handling test
+
+def test_basic_exception():
+    print("Testing basic exception handling")
+
+    try:
+        result = 10 / 2
+        print("Success: 10 / 2 =", result)
+    catch ZeroDivisionError as e:
+        print("Caught division by zero:", e)
+    finally:
+        print("Finally block executed")
+
+    print()
+
+
+def test_multiple_handlers():
+    print("Testing multiple exception handlers")
+
+    try:
+        x = 10 / 0
+    catch ZeroDivisionError:
+        print("Caught ZeroDivisionError!")
+    catch Exception as e:
+        print("Caught generic exception:", e)
+
+    print()
+
+
+def test_finally_only():
+    print("Testing finally without exception")
+
+    try:
+        x = 5 + 5
+        print("Calculation successful:", x)
+    finally:
+        print("Cleanup in finally block")
+
+    print()
+
+
+def main():
+    print("=" * 50)
+    print("  Exception Handling Tests")
+    print("=" * 50)
+    print()
+
+    test_basic_exception()
+    test_multiple_handlers()
+    test_finally_only()
+
+    print("=" * 50)
+    print("  All exception tests completed!")
+    print("=" * 50)

@@ -1,0 +1,663 @@
+# CPJ Complete Standalone Language Demo
+# This file demonstrates ALL features of CPJ as a perfect standalone language
+
+# ============================================================================
+# Imports - Module System
+# ============================================================================
+
+import Math
+import String
+import File
+import JSON
+import DateTime
+from Collections import List, Dict
+
+# ============================================================================
+# Exception Handling - Try/Catch/Finally
+# ============================================================================
+
+class ErrorHandler {
+    def safe_divide(a: int, b: int) -> float {
+        try {
+            result = a / b
+            return result
+        } catch (ZeroDivisionError e) {
+            print("Error: Cannot divide by zero!")
+            return 0.0
+        } finally {
+            print("Division operation completed")
+        }
+    }
+
+    def validate_input(value: string) -> int {
+        try {
+            return int(value)
+        } catch (ValueError e) {
+            raise ValueError("Invalid integer input")
+        }
+    }
+}
+
+# ============================================================================
+# Dictionaries and Data Structures
+# ============================================================================
+
+class DataManager {
+    def create_user(name: string, age: int, email: string) -> dict {
+        # Dictionary literal
+        user = {
+            "name": name,
+            "age": age,
+            "email": email,
+            "created_at": DateTime.now()
+        }
+        return user
+    }
+
+    def process_users() {
+        # Multiple data structures
+        users = [
+            {"name": "Alice", "age": 30, "role": "admin"},
+            {"name": "Bob", "age": 25, "role": "user"},
+            {"name": "Charlie", "age": 35, "role": "moderator"}
+        ]
+
+        # Dictionary operations
+        user_roles = {}
+        for user in users {
+            user_roles[user["name"]] = user["role"]
+        }
+
+        # Set operations
+        roles = {"admin", "user", "moderator", "guest"}
+        active_roles = {user["role"] for user in users}
+
+        return user_roles
+    }
+}
+
+# ============================================================================
+# String Methods and Operations
+# ============================================================================
+
+class TextProcessor {
+    def format_text(text: string) -> string {
+        # String methods
+        cleaned = String.strip(text)
+        upper = String.upper(cleaned)
+        lower = String.lower(cleaned)
+        title = String.title(cleaned)
+
+        # String splitting and joining
+        words = String.split(cleaned, " ")
+        reversed_text = String.reverse(cleaned)
+
+        # String formatting
+        formatted = String.format("Processed: {} (length: {})", cleaned, String.length(cleaned))
+
+        return formatted
+    }
+
+    def search_and_replace(text: string, old: string, new: string) -> string {
+        # Check if substring exists
+        if String.contains(text, old) {
+            result = String.replace(text, old, new)
+            return result
+        } else {
+            return text
+        }
+    }
+
+    def analyze_string(s: string) -> dict {
+        return {
+            "length": String.length(s),
+            "is_alpha": String.is_alpha(s),
+            "is_digit": String.is_digit(s),
+            "uppercase": String.upper(s),
+            "lowercase": String.lower(s)
+        }
+    }
+}
+
+# ============================================================================
+# File I/O Operations
+# ============================================================================
+
+class FileManager {
+    def write_data(filename: string, content: string) {
+        try {
+            File.write_text(filename, content)
+            print("File written successfully:", filename)
+        } catch (IOError e) {
+            print("Error writing file:", e)
+        }
+    }
+
+    def read_data(filename: string) -> string {
+        try {
+            if File.exists(filename) {
+                content = File.read_text(filename)
+                return content
+            } else {
+                print("File not found:", filename)
+                return ""
+            }
+        } catch (IOError e) {
+            print("Error reading file:", e)
+            return ""
+        }
+    }
+
+    def process_json_file(filename: string) -> dict {
+        # Read and parse JSON
+        try {
+            data = JSON.load(filename)
+            return data
+        } catch (Exception e) {
+            print("Error processing JSON:", e)
+            return {}
+        }
+    }
+
+    def save_json_data(filename: string, data: dict) {
+        try {
+            JSON.save(data, filename)
+            print("JSON saved to:", filename)
+        } catch (Exception e) {
+            print("Error saving JSON:", e)
+        }
+    }
+}
+
+# ============================================================================
+# Lambda Functions and Functional Programming
+# ============================================================================
+
+class FunctionalTools {
+    def demonstrate_lambdas() {
+        # Lambda functions
+        add = lambda x, y: x + y
+        square = lambda x: x ** 2
+        is_even = lambda x: x % 2 == 0
+
+        # Use lambdas
+        result1 = add(5, 3)
+        result2 = square(4)
+        result3 = is_even(7)
+
+        print("Lambda results:", result1, result2, result3)
+    }
+
+    def filter_and_map() {
+        numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        # Filter even numbers
+        evens = List.filter(numbers, lambda x: x % 2 == 0)
+
+        # Map to squares
+        squares = List.map(numbers, lambda x: x * x)
+
+        # Reduce to sum
+        total = List.reduce(numbers, lambda acc, x: acc + x, 0)
+
+        return {
+            "evens": evens,
+            "squares": squares,
+            "total": total
+        }
+    }
+}
+
+# ============================================================================
+# List Comprehensions and Advanced Iteration
+# ============================================================================
+
+class AdvancedIterators {
+    def list_comprehension_examples() {
+        # List comprehension
+        squares = [x**2 for x in range(10)]
+
+        # List comprehension with condition
+        even_squares = [x**2 for x in range(10) if x % 2 == 0]
+
+        # Nested list comprehension
+        matrix = [[i*j for j in range(5)] for i in range(5)]
+
+        # Dictionary comprehension
+        square_dict = {x: x**2 for x in range(10)}
+
+        # Set comprehension
+        unique_lengths = {len(word) for word in ["hello", "world", "python", "cpj"]}
+
+        return {
+            "squares": squares,
+            "even_squares": even_squares,
+            "square_dict": square_dict
+        }
+    }
+
+    def advanced_filtering() {
+        data = [
+            {"name": "Alice", "score": 85},
+            {"name": "Bob", "score": 92},
+            {"name": "Charlie", "score": 78},
+            {"name": "Diana", "score": 95}
+        ]
+
+        # Filter high scores
+        high_scorers = [item["name"] for item in data if item["score"] >= 90]
+
+        # Transform data
+        score_map = {item["name"]: item["score"] for item in data}
+
+        return {
+            "high_scorers": high_scorers,
+            "score_map": score_map
+        }
+    }
+}
+
+# ============================================================================
+# All Operators Support
+# ============================================================================
+
+class OperatorDemo {
+    def arithmetic_operators(a: int, b: int) -> dict {
+        return {
+            "addition": a + b,
+            "subtraction": a - b,
+            "multiplication": a * b,
+            "division": a / b,
+            "floor_division": a // b,
+            "modulo": a % b,
+            "power": a ** b
+        }
+    }
+
+    def augmented_assignment(x: int) -> int {
+        x += 5   # x = x + 5
+        x -= 2   # x = x - 2
+        x *= 3   # x = x * 3
+        x //= 2  # x = x // 2
+        x %= 7   # x = x % 7
+        x **= 2  # x = x ** 2
+        return x
+    }
+
+    def bitwise_operators(a: int, b: int) -> dict {
+        return {
+            "and": a & b,
+            "or": a | b,
+            "xor": a ^ b,
+            "left_shift": a << 2,
+            "right_shift": a >> 1,
+            "not": ~a
+        }
+    }
+
+    def comparison_operators(a: int, b: int) -> dict {
+        return {
+            "equal": a == b,
+            "not_equal": a != b,
+            "less": a < b,
+            "greater": a > b,
+            "less_equal": a <= b,
+            "greater_equal": a >= b
+        }
+    }
+
+    def logical_operators(x: bool, y: bool) -> dict {
+        return {
+            "and": x and y,
+            "or": x or y,
+            "not_x": not x,
+            "not_y": not y
+        }
+    }
+}
+
+# ============================================================================
+# Pattern Matching (Match/Case)
+# ============================================================================
+
+class PatternMatcher {
+    def classify_number(n: int) -> string {
+        match n {
+            case 0:
+                return "zero"
+            case 1:
+                return "one"
+            case n if n < 0:
+                return "negative"
+            case n if n > 100:
+                return "large"
+            case _:
+                return "other"
+        }
+    }
+
+    def process_command(cmd: string) -> string {
+        match cmd {
+            case "start":
+                return "Starting system..."
+            case "stop":
+                return "Stopping system..."
+            case "restart":
+                return "Restarting system..."
+            case "status":
+                return "System is running"
+            case _:
+                return "Unknown command"
+        }
+    }
+}
+
+# ============================================================================
+# Context Managers (With Statement)
+# ============================================================================
+
+class ResourceManager {
+    def safe_file_operation(filename: string) {
+        # Context manager for automatic resource cleanup
+        with File(filename, "w") as f {
+            f.write("Hello from CPJ!\n")
+            f.write("This is a standalone language!\n")
+        }
+        # File automatically closed here
+
+        # Read it back
+        with File(filename, "r") as f {
+            content = f.read()
+            print(content)
+        }
+    }
+
+    def multiple_resources() {
+        # Multiple context managers
+        with File("input.txt", "r") as fin, File("output.txt", "w") as fout {
+            content = fin.read()
+            processed = String.upper(content)
+            fout.write(processed)
+        }
+    }
+}
+
+# ============================================================================
+# Async/Await Support
+# ============================================================================
+
+class AsyncOperations {
+    async def fetch_data(url: string) -> dict {
+        # Simulate async operation
+        await DateTime.sleep(1)
+        return {"url": url, "status": "success"}
+    }
+
+    async def process_multiple_requests() {
+        urls = ["http://api1.com", "http://api2.com", "http://api3.com"]
+
+        results = []
+        for url in urls {
+            data = await fetch_data(url)
+            results.append(data)
+        }
+
+        return results
+    }
+}
+
+# ============================================================================
+# Decorators Support
+# ============================================================================
+
+@timer
+@log_calls
+class DecoratedClass {
+    @staticmethod
+    def utility_function(x: int) -> int {
+        return x * 2
+    }
+
+    @property
+    def computed_value() -> int {
+        return 42
+    }
+
+    @cache
+    def expensive_operation(n: int) -> int {
+        if n <= 1 {
+            return n
+        }
+        return expensive_operation(n-1) + expensive_operation(n-2)
+    }
+}
+
+# ============================================================================
+# Generators and Yield
+# ============================================================================
+
+class GeneratorExamples {
+    def number_generator(n: int) {
+        i = 0
+        while i < n {
+            yield i
+            i += 1
+        }
+    }
+
+    def fibonacci_generator(limit: int) {
+        a = 0
+        b = 1
+        count = 0
+        while count < limit {
+            yield a
+            temp = a
+            a = b
+            b = temp + b
+            count += 1
+        }
+    }
+
+    def use_generators() {
+        # Use generator
+        for num in number_generator(5) {
+            print("Generated:", num)
+        }
+
+        # Fibonacci sequence
+        fib_numbers = []
+        for fib in fibonacci_generator(10) {
+            fib_numbers.append(fib)
+        }
+        print("Fibonacci:", fib_numbers)
+    }
+}
+
+# ============================================================================
+# Advanced Type System
+# ============================================================================
+
+class TypedOperations[T] {
+    # Generic class with type parameter
+    def process(items: list[T]) -> T {
+        return items[0]
+    }
+
+    def transform(items: list[T], func: Callable[[T], T]) -> list[T] {
+        return [func(item) for item in items]
+    }
+}
+
+# ============================================================================
+# Comprehensive Calculator Example
+# ============================================================================
+
+class Calculator {
+    def __init__() {
+        self.history = []
+        self.memory = 0.0
+    }
+
+    def add(a: float, b: float) -> float {
+        result = a + b
+        self.history.append({"op": "add", "result": result})
+        return result
+    }
+
+    def subtract(a: float, b: float) -> float {
+        result = a - b
+        self.history.append({"op": "subtract", "result": result})
+        return result
+    }
+
+    def multiply(a: float, b: float) -> float {
+        result = a * b
+        self.history.append({"op": "multiply", "result": result})
+        return result
+    }
+
+    def divide(a: float, b: float) -> float {
+        try {
+            result = a / b
+            self.history.append({"op": "divide", "result": result})
+            return result
+        } catch (ZeroDivisionError e) {
+            print("Error: Division by zero!")
+            return 0.0
+        }
+    }
+
+    def power(a: float, b: float) -> float {
+        result = a ** b
+        self.history.append({"op": "power", "result": result})
+        return result
+    }
+
+    def sqrt(a: float) -> float {
+        try {
+            if a < 0 {
+                raise ValueError("Cannot take square root of negative number")
+            }
+            result = Math.sqrt(a)
+            self.history.append({"op": "sqrt", "result": result})
+            return result
+        } catch (ValueError e) {
+            print("Error:", e)
+            return 0.0
+        }
+    }
+
+    def get_history() -> list {
+        return self.history
+    }
+
+    def clear_history() {
+        self.history = []
+    }
+}
+
+# ============================================================================
+# Main Application
+# ============================================================================
+
+def main() {
+    print("=" * 60)
+    print("CPJ - Perfect Standalone Programming Language Demo")
+    print("=" * 60)
+    print()
+
+    # Test exception handling
+    print("1. Exception Handling:")
+    handler = ErrorHandler()
+    result1 = handler.safe_divide(10, 2)
+    result2 = handler.safe_divide(10, 0)
+    print(f"Results: {result1}, {result2}")
+    print()
+
+    # Test dictionaries
+    print("2. Dictionaries and Data Structures:")
+    manager = DataManager()
+    user = manager.create_user("Alice", 30, "alice@example.com")
+    print(f"User created: {user}")
+    user_roles = manager.process_users()
+    print(f"User roles: {user_roles}")
+    print()
+
+    # Test string operations
+    print("3. String Operations:")
+    processor = TextProcessor()
+    text = "  Hello CPJ World  "
+    formatted = processor.format_text(text)
+    print(f"Formatted: {formatted}")
+    analysis = processor.analyze_string("CPJ2024")
+    print(f"Analysis: {analysis}")
+    print()
+
+    # Test operators
+    print("4. All Operators:")
+    ops = OperatorDemo()
+    arithmetic = ops.arithmetic_operators(10, 3)
+    print(f"Arithmetic: {arithmetic}")
+    bitwise = ops.bitwise_operators(12, 5)
+    print(f"Bitwise: {bitwise}")
+    print()
+
+    # Test lambda and functional
+    print("5. Lambda Functions:")
+    tools = FunctionalTools()
+    tools.demonstrate_lambdas()
+    results = tools.filter_and_map()
+    print(f"Functional results: {results}")
+    print()
+
+    # Test comprehensions
+    print("6. List Comprehensions:")
+    iterators = AdvancedIterators()
+    comp_results = iterators.list_comprehension_examples()
+    print(f"Comprehensions: {comp_results}")
+    print()
+
+    # Test pattern matching
+    print("7. Pattern Matching:")
+    matcher = PatternMatcher()
+    classifications = [
+        matcher.classify_number(0),
+        matcher.classify_number(1),
+        matcher.classify_number(-5),
+        matcher.classify_number(150),
+        matcher.classify_number(42)
+    ]
+    print(f"Classifications: {classifications}")
+    print()
+
+    # Test calculator
+    print("8. Calculator Demo:")
+    calc = Calculator()
+    print(f"10 + 5 = {calc.add(10, 5)}")
+    print(f"10 - 5 = {calc.subtract(10, 5)}")
+    print(f"10 * 5 = {calc.multiply(10, 5)}")
+    print(f"10 / 5 = {calc.divide(10, 5)}")
+    print(f"2 ** 8 = {calc.power(2, 8)}")
+    print(f"sqrt(16) = {calc.sqrt(16)}")
+    print(f"History: {calc.get_history()}")
+    print()
+
+    # Test file operations
+    print("9. File I/O:")
+    file_mgr = FileManager()
+    test_data = {
+        "name": "CPJ Demo",
+        "version": "2.0",
+        "features": ["exceptions", "dictionaries", "strings", "file_io", "lambdas"]
+    }
+    file_mgr.save_json_data("test_output.json", test_data)
+    print()
+
+    print("=" * 60)
+    print("All CPJ standalone language features demonstrated!")
+    print("CPJ is now a PERFECT STANDALONE PROGRAMMING LANGUAGE!")
+    print("=" * 60)
+}
+
+# Run the application
+main()

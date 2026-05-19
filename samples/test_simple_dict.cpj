@@ -1,0 +1,17 @@
+# Simple dictionary test
+
+def main():
+    print("Testing dictionaries")
+
+    # Simple dict
+    person = {"name": "Alice", "age": 30}
+    print("Person:", person)
+
+    # Access
+    print("Name:", person["name"])
+
+    # Empty dict
+    empty = {}
+    print("Empty:", empty)
+
+    print("Done!")
