@@ -395,7 +395,10 @@ class Emitter:
 
     def emit_GUIBlock(self, node, indent=0):
         # Ensure tkinter import and runtime scaffolding at top if not present
-        self.lines.append("import tkinter")
+        self.lines.append("try:")
+        self.lines.append("    import tkinter")
+        self.lines.append("except Exception:")
+        self.lines.append("    tkinter = None")
         self.lines.append("")
         # lightweight widget variable to avoid requiring a Tk root at import time
         self.lines.append("class _WidgetVar:")
@@ -405,6 +408,26 @@ class Emitter:
         self.lines.append("        self._v = v")
         self.lines.append("    def get(self):")
         self.lines.append("        return self._v")
+        self.lines.append("")
+        self.lines.append("class _HeadlessButton:")
+        self.lines.append("    def __init__(self, text=''):")
+        self.lines.append("        self.text = text")
+        self.lines.append("        self.command = None")
+        self.lines.append("    def configure(self, **kwargs):")
+        self.lines.append("        if 'command' in kwargs:")
+        self.lines.append("            self.command = kwargs['command']")
+        self.lines.append("    config = configure")
+        self.lines.append("    def invoke(self):")
+        self.lines.append("        if self.command:")
+        self.lines.append("            return self.command()")
+        self.lines.append("")
+        self.lines.append("def _make_button(text):")
+        self.lines.append("    if tkinter is not None:")
+        self.lines.append("        try:")
+        self.lines.append("            return tkinter.Button(text=text)")
+        self.lines.append("        except Exception:")
+        self.lines.append("            pass")
+        self.lines.append("    return _HeadlessButton(text)")
         self.lines.append("")
         self.lines.append("# widgets container for GUI elements")
         self.lines.append("widgets = {}")
@@ -601,7 +624,7 @@ class Emitter:
                         self.lines.append("    pass")
                 # expose handler name and create a Button widget placeholder
                 btn_key = f"btn{self._btn_counter-1}"
-                self.lines.append(f"widgets['{btn_key}'] = tkinter.Button(text={repr(label)})")
+                self.lines.append(f"widgets['{btn_key}'] = _make_button({repr(label)})")
                 self.lines.append(f"# wire button {label} -> {hname}")
                 self.lines.append(f"widgets['{btn_key}'].configure(command={hname})")
                 continue

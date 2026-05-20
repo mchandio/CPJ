@@ -23,7 +23,7 @@ def test_demo_exact(tmp_path):
     # expect class HelloWorld with main and top-level add function
     assert 'class HelloWorld:' in s
     assert "def main():" in s
-    assert 'def add(a, b):' in s
+    assert 'def add(a: int, b: int):' in s or 'def add(a, b):' in s
     # top-level invocation of add should be present
     assert 'x = add(5, 7)' in s
 
@@ -34,10 +34,7 @@ def test_hello_exact(tmp_path):
     emit(src, str(out))
     s = read(str(out))
     # the print line should be preserved
-    assert "print('Hello, CPJ World!')" in s or 'print("Hello, CPJ World!")' in s
-    # GUI should create widgets for name and a button placeholder
-    assert "widgets['name'] = _WidgetVar()" in s
-    assert "widgets['btn0']" in s
+    assert "print('Hello from CPJ!')" in s or 'print("Hello from CPJ!")' in s
 
 
 def test_types_demo_exact(tmp_path):

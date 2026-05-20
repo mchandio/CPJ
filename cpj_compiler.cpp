@@ -222,6 +222,21 @@ static void ensure_dir(const std::string &d)
     std::filesystem::create_directories(d);
 }
 
+static bool emit_minimal_java_backend(const std::string &out_dir)
+{
+    ensure_dir(out_dir);
+    std::filesystem::path out_file = std::filesystem::path(out_dir) / "GeneratedCPJ.java";
+    std::ofstream out(out_file);
+    if (!out)
+        return false;
+
+    out << "public final class GeneratedCPJ {\n"
+        << "    private GeneratedCPJ() {}\n"
+        << "    public static void main(String[] args) {}\n"
+        << "}\n";
+    return true;
+}
+
 static int run_cmd(const std::string &cmd, bool verbose)
 {
     if (verbose)
@@ -460,6 +475,16 @@ int main(int argc, char **argv)
             return 3;
         }
         std::cout << "[CPJ] Python backend emitted: " << py_out_file << "\n";
+    }
+    if (emit_java)
+    {
+        std::string java_out_dir = out_dir + "/java";
+        if (!emit_minimal_java_backend(java_out_dir))
+        {
+            std::cerr << "[CPJ] Error: Java emitter failed.\n";
+            return 6;
+        }
+        std::cout << "[CPJ] Java backend emitted: " << java_out_dir << "/GeneratedCPJ.java\n";
     }
     if (emit_web)
     {

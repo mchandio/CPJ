@@ -1144,13 +1144,14 @@ class Parser:
     def parse_gui(self):
         l = self.next_line().strip()
         # expect 'GUI {' on the same line or next
-        rest = ''
         if l.endswith('{'):
-            # collect until matching '}'
+            # collect until the matching top-level '}', preserving nested blocks
             lines = []
-            while self.peek_line() is not None:
+            depth = l.count('{') - l.count('}')
+            while self.peek_line() is not None and depth > 0:
                 ln = self.next_line().strip()
-                if ln == '}':
+                depth += ln.count('{') - ln.count('}')
+                if depth <= 0 and ln == '}':
                     break
                 lines.append(ln)
             return GUIBlock(lines)
@@ -1159,9 +1160,12 @@ class Parser:
             if self.peek_line() and self.peek_line().strip().startswith('{'):
                 self.next_line()
                 lines = []
-                while self.peek_line() is not None:
+                depth = 1
+                while self.peek_line() is not None and depth > 0:
                     ln = self.next_line().strip()
-                    if ln == '}': break
+                    depth += ln.count('{') - ln.count('}')
+                    if depth <= 0 and ln == '}':
+                        break
                     lines.append(ln)
                 return GUIBlock(lines)
         return GUIBlock([])
