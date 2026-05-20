@@ -53,6 +53,8 @@ jobs:
         rm -rf build
         cmake -S . -B build
         cmake --build build --parallel
+        cp build/cpj_compiler ./cpj_compiler
+        chmod +x ./cpj_compiler
 
     - name: Run Python tests
       run: |
