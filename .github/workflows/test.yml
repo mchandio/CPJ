@@ -5,6 +5,7 @@ on:
     branches: [ main, test-*, feature-* ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -49,10 +50,9 @@ jobs:
 
     - name: Build C++ components
       run: |
-        mkdir -p build
-        cd build
-        cmake ..
-        make
+        rm -rf build
+        cmake -S . -B build
+        cmake --build build --parallel
 
     - name: Run Python tests
       run: |
@@ -60,8 +60,7 @@ jobs:
 
     - name: Run C++ tests
       run: |
-        cd build
-        ctest --output-on-failure
+        ctest --test-dir build --output-on-failure
 
     - name: Run Java tests
       run: |
@@ -96,11 +95,11 @@ jobs:
         
     - name: Run linters
       run: |
-        flake8 . --count --max-complexity=10 --max-line-length=100 --statistics
-        mypy . --strict
-        pylint --rcfile=.pylintrc .
-        black . --check
-        isort . --check-only
+        flake8 . --exclude=.git,__pycache__,.venv,cpj_venv,.tools,build,dist,generated,htmlcov,.pytest_cache,.gradle,bin,java/build,java/bin --count --max-complexity=10 --max-line-length=100 --statistics
+        mypy . --strict --exclude '(^|/)(\.venv|cpj_venv|\.tools|build|dist|generated|htmlcov|\.pytest_cache|\.gradle|bin|java/build|java/bin)(/|$)'
+        pylint --rcfile=.pylintrc --ignore=.venv,cpj_venv,.tools,build,dist,generated,htmlcov,.pytest_cache,.gradle,bin --ignore-paths='^java/(build|bin)/' .
+        black . --check --extend-exclude '(\.venv|cpj_venv|\.tools|build|dist|generated|htmlcov|\.pytest_cache|\.gradle|bin|java/(build|bin))'
+        isort . --check-only --skip .venv --skip cpj_venv --skip .tools --skip build --skip dist --skip generated --skip htmlcov --skip .pytest_cache --skip .gradle --skip bin --skip java/build --skip java/bin
 
   security:
     runs-on: ubuntu-latest
@@ -119,5 +118,5 @@ jobs:
         
     - name: Run security checks
       run: |
-        bandit -r . -ll
+        bandit -r . -ll -x .venv,cpj_venv,.tools,build,dist,generated,htmlcov,.pytest_cache,.gradle,bin,java/build,java/bin
         safety check
