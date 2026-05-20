@@ -70,13 +70,14 @@ jobs:
         xvfb-run -a ./gradlew :java:test --no-daemon
 
     - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.12'
+      continue-on-error: true
       uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: true
-        path_to_write_summary: ./coverage/codecov_report.txt
+        fail_ci_if_error: false
         verbose: true
 
   lint:
