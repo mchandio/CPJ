@@ -2,7 +2,6 @@ astroid
 antlr4-python3-runtime
 jsonschema>=4.0.0
 pygls>=1.0.0,<2.0.0
-setuptools>=61.0
 pyzmq>=25.1.0
 numpy>=1.24.0
 pytest>=7.4.0

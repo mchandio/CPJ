@@ -16,7 +16,6 @@ dependencies = [
     "jsonschema>=4.0.0",
     # Optional dev dependency for language server development
     "pygls>=1.0.0,<2.0.0",
-    "setuptools>=61.0",
 ]
 
 [tool.setuptools.packages.find]

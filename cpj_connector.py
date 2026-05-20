@@ -13,7 +13,6 @@ import time
 import uuid
 import threading
 import queue
-import pkg_resources
 import subprocess
 import sys
 import re
