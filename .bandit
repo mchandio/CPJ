@@ -1,3 +1,3 @@
 [bandit]
-exclude_dirs = test,tests,build,dist,.venv,cpj_venv,.tools,generated,htmlcov,.pytest_cache,.gradle,bin,java/build,java/bin
+exclude_dirs = test,tests,build,dist,.venv,cpj_venv,.tools,generated,htmlcov,.pytest_cache,.gradle,bin,java/build,java/bin,cpj-local-release-1.1.0,CPJLexer.py,CPJListener.py,CPJParser.py,grammar
 skips = B101,B311

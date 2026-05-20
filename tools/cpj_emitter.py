@@ -60,8 +60,9 @@ class Emitter:
             self.lines.append('')
 
         # Add necessary internal imports
-        if self.imports:
-            for imp in sorted(self.imports):
+        regular_imports = sorted(imp for imp in self.imports if imp not in self.type_imports)
+        if regular_imports:
+            for imp in regular_imports:
                 self.lines.append(f'import {imp}')
             self.lines.append('')
 
@@ -71,10 +72,9 @@ class Emitter:
                 self.emit(it, indent)
 
         # Emit type imports if needed
-        if any(t in self.type_imports for t in self.imports):
-            type_imports = [self.type_imports[t] for t in self.imports if t in self.type_imports]
-            if type_imports:
-                self.lines.insert(0, f'from {', '.join(type_imports)} import {', '.join(t.split('.')[-1] for t in type_imports)}')
+        type_names = sorted(t for t in self.imports if t in self.type_imports)
+        if type_names:
+            self.lines.insert(0, f"from typing import {', '.join(type_names)}")
 
         # After emitting all top-level items, auto-invoke main if present.
         # Prefer a top-level function `main()`; otherwise call a class `main` as a static method.
