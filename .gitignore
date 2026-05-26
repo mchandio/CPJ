@@ -37,3 +37,18 @@ cpj_cpp
 cpj_main
 cpj_standalone
 test_runner
+
+# Backup/temporary/dev scratch files
+*.bak
+*.ast
+*.parser
+*.new
+0001-ci-headless-and-dev-workflow.patch
+
+# Patch and coverage files
+*.patch
+
+# IDE/editor/project files
+.idea/
+.vscode/
+.DS_Store
