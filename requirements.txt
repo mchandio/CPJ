@@ -1,2 +1,5 @@
 antlr4-python3-runtime
 pytest
+pytest-asyncio
+pytest-xdist
+pytest-timeout
